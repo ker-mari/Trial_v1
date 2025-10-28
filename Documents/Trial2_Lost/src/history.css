@@ -1,0 +1,66 @@
+.history-screen {
+  background: linear-gradient(to bottom, #e6f0f9, #003b6f);
+  min-height: 100vh;
+  padding: 2rem;
+}
+
+.history-title {
+  color: #5a7a95;
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.history-table-container {
+  background: white;
+  border-radius: 15px;
+  padding: 1rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border: 3px solid #4a90e2;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.history-table th {
+  background: #f8f9fa;
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.history-table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.history-table tr.gray-row {
+  background: #f8f9fa;
+}
+
+.code-badge {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 24px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  color: white;
+}
+
+.code-badge.lost {
+  background: #d4a574;
+}
+
+.code-badge.valuable {
+  background: #f1c40f;
+  color: #333;
+}

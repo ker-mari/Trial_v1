@@ -1,0 +1,1080 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
+}
+
+.app {
+  height: 100vh;
+  width: 100%;
+  background: linear-gradient(to bottom, #e6f0f9, #003b6f);
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  background: #003b6f;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+}
+
+.logo-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo {
+  height: 40px;
+  width: 40px;
+  background: white;
+  border-radius: 50%;
+}
+
+.header h1 {
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.header span {
+  font-weight: 800;
+}
+
+.menu-icon {
+  font-size: 24px;
+  cursor: pointer;
+}
+
+.start-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 10%;
+  text-align: center;
+  gap: 8rem;
+}
+
+.pin-screen {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10%;
+}
+
+.content {
+  max-width: 450px;
+}
+
+.content h2 {
+  color: #003b6f;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.content p {
+  color: #2e3a46;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 25px;
+}
+
+.start-btn {
+  background: #003b6f;
+  color: white;
+  border: none;
+  border-radius: 50px;
+  padding: 12px 30px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.start-btn:hover {
+  background: #024e90;
+}
+
+.pin-input {
+  width: 300px;
+  padding: 12px 20px;
+  border-radius: 25px;
+  border: 1px solid #ccc;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  font-size: 1rem;
+  outline: none;
+  margin-bottom: 20px;
+}
+
+.proceed-btn {
+  display: block;
+  width: 150px;
+  padding: 12px 0;
+  border-radius: 30px;
+  background: transparent;
+  border: 2px solid #003b6f;
+  color: #003b6f;
+  font-weight: 500;
+  font-size: 1rem;
+  cursor: not-allowed;
+  transition: 0.3s ease;
+}
+
+.proceed-btn.active {
+  background: #003b6f;
+  color: white;
+  cursor: pointer;
+}
+
+.proceed-btn.active:hover {
+  background: #024e90;
+}
+
+.image-side {
+  position: relative;
+}
+
+.img-bg {
+  width: 180px;
+  height: 180px;
+  background: #003b6f;
+  border-radius: 20px;
+  position: absolute;
+  top: 40px;
+  left: 60px;
+  z-index: 1;
+  border: 5px solid #007bff;
+}
+
+.school-img {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  border: 6px solid #ffe45c;
+  background: #ccc;
+  position: relative;
+  z-index: 2;
+}
+
+/* Dashboard Screen Styles */
+.dashboard-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 40px 10%;
+  background: linear-gradient(to bottom, #e6f0f9, #003b6f);
+}
+
+.greeting {
+  margin-bottom: 80px;
+}
+
+.currently-text {
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  font-style: italic;
+  margin-bottom: 5px;
+  font-weight: 400;
+}
+
+.user-name {
+  color: #000;
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.dashboard-content {
+  text-align: center;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.dashboard-title {
+  color: #003b6f;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 20px;
+}
+
+.dashboard-subtitle {
+  color: #1a1a1a;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin-bottom: 60px;
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.button-grid {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 40px;
+  flex-wrap: wrap;
+  margin-top: 50px;
+}
+
+.button-grid-bottom {
+  display: flex;
+  justify-content: center;
+  margin-top: 35px;
+}
+
+.action-btn {
+  padding: 22px 70px;
+  border-radius: 60px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+  min-width: 280px;
+}
+
+.view-item-btn {
+  background: linear-gradient(135deg, #0066cc 0%, #004c99 100%);
+  color: white;
+}
+
+.view-item-btn:hover {
+  background: linear-gradient(135deg, #004c99 0%, #003366 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+.handover-btn {
+  background: #e8f4fc;
+  color: #003b6f;
+  border: 3px solid #003b6f;
+}
+
+.handover-btn:hover {
+  background: #d0e8f7;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+.history-btn {
+  background: linear-gradient(135deg, #ffd93d 0%, #ffb800 100%);
+  color: #2e3a46;
+  min-width: 320px;
+}
+
+.history-btn:hover {
+  background: linear-gradient(135deg, #ffb800 0%, #ff9500 100%);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.3);
+}
+
+/* ADD THESE STYLES TO YOUR EXISTING App.css FILE */
+
+/* VIEW ITEMS SCREEN STYLES */
+.view-items-screen {
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem;
+  background-color: #f0f4f8;
+  box-sizing: border-box;
+}
+
+.view-items-header {
+  background: #003b6f;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 40px;
+  margin-bottom: 0;
+}
+
+.view-items-header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.view-items-title {
+  font-size: 1.5rem;
+  margin: 0;
+}
+
+.dashboard-link span {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.view-items-controls {
+  margin-bottom: 2rem;
+}
+
+.add-filter-btn {
+  background-color: #ffffff;
+  color: #002D62;
+  border: 1px solid #cdd4da;
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.items-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+.item-card {
+  background-color: #ffffff;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e0e5eb;
+  color: #002D62;
+}
+
+.item-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.item-card-header h3 {
+  margin: 0;
+  font-size: 1rem;
+  text-transform: uppercase;
+}
+
+.valuable-tag {
+  background-color: #FFF3CD;
+  color: #856404;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border: 1px solid #FFD700;
+}
+
+.item-category {
+  font-size: 0.9rem;
+  color: #5a6e83;
+  margin: 0.25rem 0 1rem 0;
+}
+
+.item-image-placeholder {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4rem; /* For emoji icons */
+  min-height: 120px;
+  margin-bottom: 1.5rem;
+}
+
+.view-details-btn {
+  background-color: #002D62; /* Dark blue */
+  color: #ffffff;
+  border: none;
+  padding: 0.8rem;
+  border-radius: 25px;
+  cursor: pointer;
+  width: 100%;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: background-color 0.2s;
+}
+
+.view-details-btn:hover {
+  background-color: #004080; /* Darker blue */
+}
+
+/* Ensure consistent logo size */
+.logo {
+  height: 40px;
+}
+
+/* ADD THESE NEW MODAL STYLES TO YOUR App.css FILE */
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 45, 98, 0.6);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal-content {
+  background-color: #ffffff;
+  padding: 2rem 2.5rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 800px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  color: #002D62;
+}
+
+.modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  background-color: #fcebeb;
+  color: #c53030;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+}
+
+.modal-title {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.modal-body {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.modal-image-container {
+  flex-basis: 35%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-image-placeholder {
+  font-size: 8rem;
+}
+
+.modal-details-container {
+  flex-basis: 65%;
+}
+
+.modal-details-container h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  text-transform: uppercase;
+}
+
+.modal-category {
+  font-size: 1rem;
+  color: #5a6e83;
+  margin-top: 0.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.modal-info-label {
+  font-weight: bold;
+  margin: 1rem 0 0.25rem 0;
+  font-size: 0.9rem;
+}
+
+.tagalog-hint {
+  font-weight: normal;
+  color: #718096;
+  font-style: italic;
+}
+
+.modal-info-value {
+  margin: 0;
+}
+
+.modal-divider {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 1.5rem 0;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+.modal-action-btn {
+  padding: 0.75rem 2rem;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  border: 1px solid;
+}
+
+.claim-btn {
+  background-color: #002D62;
+  color: #ffffff;
+  border-color: #002D62;
+}
+
+.edit-btn {
+  background-color: #ffffff;
+  color: #002D62;
+  border-color: #002D62;
+}
+
+/* ADD THESE NEW HAND OVER FORM STYLES TO YOUR App.css FILE */
+
+.hand-over-screen {
+  width: 100%;
+  min-height: 100vh;
+  padding: 2rem 4rem;
+  background: linear-gradient(to bottom, #002D62, #004080);
+  box-sizing: border-box;
+}
+
+.hand-over-title {
+  text-align: center;
+  color: #ffffff;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-weight: 500;
+}
+
+.hand-over-form-container {
+  background-color: #ffffff;
+  border-radius: 20px;
+  padding: 2.5rem 3rem;
+  max-width: 900px;
+  margin: 0 auto;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.hand-over-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  width: 100%;
+}
+
+.top-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.finders-info {
+  flex-basis: 60%;
+}
+
+.on-duty-info {
+  flex-basis: 40%;
+}
+
+.form-group label {
+  font-weight: bold;
+  color: #002D62;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-input, .form-textarea, .dropdown-placeholder {
+  background-color: #f0f4f8;
+  border: 1px solid #d1d9e2;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+  color: #8896a7;
+}
+
+.finders-info .form-input {
+  margin-bottom: 0.75rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.dropdown-section {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+}
+
+.dropdown-placeholder {
+  text-align: left;
+  color: #8896a7;
+  cursor: pointer;
+}
+
+.form-textarea {
+  width: 100%;
+  height: 120px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.submit-btn {
+  background-color: #ffffff;
+  color: #5a6e83;
+  border: 1px solid #cdd4da;
+  padding: 0.75rem 2.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.submit-btn:hover {
+  background-color: #f0f4f8;
+  border-color: #aeb9c5;
+}
+
+/* Dropdown Styles */
+.dropdown-container {
+  position: relative;
+}
+
+.dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d9e2;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.dropdown-item {
+  padding: 0.8rem 1rem;
+  cursor: pointer;
+  color: #333;
+  border-bottom: 1px solid #f0f4f8;
+  transition: background-color 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f0f4f8;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-placeholder:hover {
+  background-color: #e8f0f8;
+}
+/* Calendar Styles */
+.calendar-container {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #d1d9e2;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.calendar-nav {
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.calendar-nav:hover {
+  background-color: #f0f4f8;
+}
+
+.calendar-month {
+  font-weight: bold;
+  color: #002D62;
+}
+
+.calendar-grid {
+  width: 100%;
+}
+
+.calendar-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.calendar-weekdays div {
+  text-align: center;
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #5a6e83;
+  padding: 0.25rem;
+}
+
+.calendar-days {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.25rem;
+}
+
+.calendar-day {
+  text-align: center;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.calendar-day:hover {
+  background-color: #e8f0f8;
+}
+
+.calendar-day.selected {
+  background-color: #002D62;
+  color: white;
+}
+.calendar-day.empty {
+  cursor: default;
+}
+
+.calendar-day.empty:hover {
+  background-color: transparent;
+}
+/* Scrollable dropdown for locations */
+.dropdown-menu.scrollable {
+  max-height: 150px;
+  overflow-y: auto;
+}
+/* Claim Form Modal Styles */
+.claim-form-modal {
+  background-color: #ffffff;
+  padding: 2rem 2.5rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 900px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+  color: #002D62;
+}
+
+.claim-form-title {
+  text-align: center;
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  color: #002D62;
+  font-weight: 600;
+}
+
+.claim-form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.claim-form-section {
+  display: flex;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.claim-info-group {
+  flex: 1;
+}
+
+.claim-info-group h3 {
+  margin-bottom: 1rem;
+  font-size: 1.1rem;
+  color: #002D62;
+}
+
+.claim-info-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.claim-info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.claim-info-item label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.25rem;
+  color: #002D62;
+}
+
+.claim-info-item span {
+  color: #5a6e83;
+  font-size: 0.9rem;
+}
+
+.claim-description {
+  display: flex;
+  flex-direction: column;
+}
+
+.claim-description label {
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: #002D62;
+}
+
+.claim-description p {
+  color: #5a6e83;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.claim-duty-info {
+  display: flex;
+  align-items: flex-start;
+  padding-top: 1rem;
+}
+
+.claim-duty-info label {
+  font-weight: bold;
+  color: #002D62;
+  font-size: 0.9rem;
+}
+
+.claim-owner-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.claim-input {
+  background-color: #f0f4f8;
+  border: 1px solid #d1d9e2;
+  border-radius: 10px;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  color: #333;
+}
+
+.claim-input::placeholder {
+  color: #8896a7;
+}
+
+.claim-form-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.claim-submit-btn {
+  background-color: #ffffff;
+  color: #5a6e83;
+  border: 1px solid #cdd4da;
+  padding: 0.75rem 2.5rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s ease-in-out;
+}
+
+.claim-submit-btn:hover {
+  background-color: #f0f4f8;
+  border-color: #aeb9c5;
+}
+/* Success Modal Styles */
+.success-modal {
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 20px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.success-content {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.success-icon {
+  width: 60px;
+  height: 60px;
+  background-color: #4CAF50;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.success-message {
+  color: #333;
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.success-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.success-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 25px;
+  font-weight: bold;
+  font-size: 0.9rem;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.2s ease;
+}
+
+.close-btn {
+  background-color: #ffffff;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.close-btn:hover {
+  background-color: #dc3545;
+  color: white;
+}
+
+.view-items-btn {
+  background-color: #002D62;
+  color: white;
+  border-color: #002D62;
+}
+
+.view-items-btn:hover {
+  background-color: #004080;
+  border-color: #004080;
+}
+
+/* Modern PIN Modal Styles */
+.pin-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.pin-modal {
+  background: linear-gradient(to top, #ffeaa7 0%, #f8f6e8 100%);
+  padding: 2.5rem 3rem;
+  border-radius: 25px;
+  width: 90%;
+  max-width: 480px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  text-align: center;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pin-modal-text {
+  color: #2c3e50;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0 0 2.5rem 0;
+  font-weight: 500;
+}
+
+.pin-modal-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.pin-cancel-btn, .pin-confirm-btn {
+  padding: 0.9rem 2.2rem;
+  border-radius: 25px;
+  font-size: 1rem;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  min-width: 120px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.pin-cancel-btn {
+  background: linear-gradient(135deg, #e8e8e8 0%, #d5d5d5 100%);
+  color: #555;
+  border: 1px solid #ccc;
+}
+
+.pin-cancel-btn:hover {
+  background: linear-gradient(135deg, #d5d5d5 0%, #c2c2c2 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+.pin-confirm-btn {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  color: white;
+}
+
+.pin-confirm-btn:hover {
+  background: linear-gradient(135deg, #c0392b 0%, #a93226 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.3);
+}
