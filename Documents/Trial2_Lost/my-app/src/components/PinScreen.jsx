@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
+import { authAPI } from '../services/api';
 
 const PinScreen = ({ onPinSubmit }) => {
   const [pin, setPin] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [isAuthenticating, setIsAuthenticating] = useState(false);
 
-  const handleSubmit = () => {
-    if (pin === '1234' || pin === '5678' || pin === '9999') {
-      const userName = pin === '1234' ? 'Mr. Guard 1' : pin === '5678' ? 'Ms. Guard 2' : 'Admin User';
-      onPinSubmit(userName);
-    } else {
+  const handleSubmit = async () => {
+    setIsAuthenticating(true);
+    try {
+      const { data } = await authAPI.verifyPin(pin);
+      if (data.success) {
+        // Pass auth token along with user data
+        onPinSubmit(data.user_name, data.is_admin, data.auth_token);
+      } else {
+        setShowModal(true);
+      }
+    } catch {
       setShowModal(true);
+    } finally {
+      setIsAuthenticating(false);
     }
   };
 
@@ -21,27 +31,35 @@ const PinScreen = ({ onPinSubmit }) => {
   return (
     <>
       <div className="pin-screen">
-        <div className="content">
-          <h2>Together, we bring things back!</h2>
-          <p>Found or lost something? Don't worry — help is just a click away!</p>
-          <input
-            type="password"
-            placeholder="ENTER PIN:"
-            className="pin-input"
-            value={pin}
-            onChange={(e) => setPin(e.target.value)}
-          />
-          <button
-            className={pin ? "proceed-btn active" : "proceed-btn"}
-            disabled={!pin}
-            onClick={handleSubmit}
-          >
-            Proceed
-          </button>
-        </div>
-        <div className="image-side">
-          <div className="img-bg"></div>
-          <img src="/school.png" alt="school" className="school-img" />
+        <div className="pin-content">
+          <div className="content">
+            <h2>Together, we bring<br />things back!</h2>
+            <p>Found or lost something?  <br /> Don't worry — help is just a click away!</p>
+            <input
+              type="password"
+              placeholder="ENTER PIN:"
+              className="pin-input"
+              value={pin}
+              onChange={(e) => setPin(e.target.value)}
+            />
+            <button
+              className={pin ? "proceed-btn active" : "proceed-btn"}
+              disabled={!pin || isAuthenticating}
+              onClick={handleSubmit}
+            >
+              {isAuthenticating ? (
+                <span className="authenticating">
+                  Authenticating<span className="dots">...</span>
+                </span>
+              ) : (
+                "Proceed"
+              )}
+            </button>
+          </div>
+          <div className="image-side">
+            <div className="img-bg"></div>
+            <img src="/school.png" alt="school" className="school-img" />
+          </div>
         </div>
       </div>
 

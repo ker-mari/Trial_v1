@@ -1,27 +1,36 @@
 import React from 'react';
 
 export const MainHeader = ({ screen, onDashboard }) => {
-  if (screen === "start" || screen === "pin") {
-    return (
-      <header className="header">
-        <div className="logo-section">
-          <img src="/Logo.png" alt="logo" className="logo" />
-          <h1><span>LA VERDAD</span> LOST N FOUND</h1>
-        </div>
-        <div className="menu-icon">&#9776;</div>
-      </header>
-    );
-  }
-
   return (
-    <header className="view-items-header">
-      <div className="view-items-header-left">
+    <header className="header">
+      <div className="logo-section">
         <img src="/Logo.png" alt="logo" className="logo" />
-        <h2 className="view-items-title">LA VERDAD LOST N FOUND</h2>
+        <h1><span className="la-verdad">LA VERDAD</span> <span className="lost-found">LOST N FOUND</span></h1>
       </div>
-      <div className="dashboard-link">
-        <span onClick={onDashboard}>&#9638; DASHBOARD</span>
-      </div>
+      {(screen === 'handOver' || screen === 'viewItems' || screen === 'history' || screen === 'approvalQueues' || screen === 'itemsToBeCleared' || screen === 'claimForm') && (
+        <div className="header-middle">
+          <h2 className="form-title">
+            {screen === 'handOver' && 'HAND OVER FORM'}
+            {screen === 'viewItems' && 'VIEW CLAIMABLE ITEMS'}
+            {screen === 'history' && 'HISTORY PAGE'}
+            {screen === 'approvalQueues' && 'APPROVAL QUEUES'}
+            {screen === 'itemsToBeCleared' && 'ITEMS TO BE CLEARED'}
+            {screen === 'claimForm' && 'CLAIM FORM'}
+          </h2>
+        </div>
+      )}
+      {screen !== "start" && screen !== "pin" && screen !== "dashboard" && (
+        <div className="dashboard-link">
+          <span onClick={onDashboard}>
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828673.png" alt="Dashboard" className="btn-icon" />
+            DASHBOARD
+          </span>
+        </div>
+      )}
+      {/* For Menu button -> if kailangan   
+      {(screen === "start" || screen === "pin") && (
+        <div className="menu-icon">&#9776;</div>
+      )} */}
     </header>
   );
 };
