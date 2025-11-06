@@ -6,11 +6,57 @@
   padding-right: 50px;
 }
 
+@media (max-width: 768px) {
+  .items-header {
+    flex-direction: column;
+    gap: 15px;
+    padding-right: 20px;
+    padding-left: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .items-header {
+    gap: 12px;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+}
+
+@media (max-width: 360px) {
+  .items-header {
+    gap: 10px;
+    padding-right: 10px;
+    padding-left: 10px;
+  }
+}
+
 .items-title {
   color: #005197ff;
   margin: 0;
   margin-right: auto;
   margin-left: 50px;
+}
+
+@media (max-width: 768px) {
+  .items-title {
+    margin-left: 0;
+    margin-right: 0;
+    text-align: center;
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .items-title {
+    font-size: 1.3rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .items-title {
+    font-size: 1.2rem;
+  }
 }
 
 .clear-all-btn {
@@ -26,6 +72,32 @@
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 8px rgba(0, 59, 111, 0.2);
   font-family: "Atkinson Hyperlegible", sans-serif;
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .clear-all-btn {
+    margin-right: 0;
+    width: 100%;
+    max-width: 280px;
+    padding: 14px 24px;
+  }
+}
+
+@media (max-width: 480px) {
+  .clear-all-btn {
+    max-width: 260px;
+    padding: 12px 20px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .clear-all-btn {
+    max-width: 240px;
+    padding: 12px 18px;
+    font-size: 0.9rem;
+  }
 }
 
 .clear-all-btn:hover:not(:disabled) {
@@ -54,6 +126,29 @@
   transition: all 0.2s ease-in-out;
   box-shadow: 0 2px 6px rgba(0, 59, 111, 0.2);
   font-family: "Atkinson Hyperlegible", sans-serif;
+  min-height: 44px;
+}
+
+@media (max-width: 768px) {
+  .clear-item-btn {
+    padding: 10px 18px;
+    font-size: 0.85rem;
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .clear-item-btn {
+    padding: 9px 16px;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .clear-item-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
 }
 
 .clear-item-btn:hover {
