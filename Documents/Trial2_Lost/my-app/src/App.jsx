@@ -14,6 +14,8 @@ import ClaimForm from './components/ClaimForm';
 import MainHeader from './components/Header';
 import { ItemDetailsModal, ClaimFormModal, EditFormModal, SuccessModal } from './components/Modals';
 
+ 
+
 function App() {
   const [screen, setScreen] = useState(() => {
     sessionStorage.removeItem('authenticated');
@@ -111,7 +113,8 @@ function App() {
 
   const loadHistoryFromDatabase = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/history', {
+      const url = import.meta.env.VITE_API_URL;
+      const response = await fetch(`${url}/history`, {
         headers: {
           'X-Auth-Token': sessionStorage.getItem('authToken'),
           'Content-Type': 'application/json'
