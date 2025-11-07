@@ -7,8 +7,9 @@
 </head>
 <body>
     <div id="root"></div>
-    <script>
+    <h1>Welcome to the Lost & Found System</h1>
+    {{-- <script>
         window.location.href = 'http://localhost:3000';
-    </script>
+    </script> --}}
 </body>
 </html>
