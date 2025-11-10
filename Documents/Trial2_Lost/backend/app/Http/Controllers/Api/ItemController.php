@@ -169,10 +169,20 @@ class ItemController extends Controller
         }
 
         $validated = $request->validate([
-            'owner' => 'required|string|max:100'
+            'owner' => 'required|string|max:100',
+            'claimer_name' => 'nullable|string|max:100',
+            'claimer_grade' => 'nullable|string|max:100',
+            'claimer_id' => 'nullable|string|max:50',
+            'claim_date' => 'nullable|date'
         ]);
 
-        $item->update(['status' => 'claimed']);
+        $item->update([
+            'status' => 'claimed',
+            'claimer_name' => $validated['claimer_name'] ?? $validated['owner'],
+            'claimer_grade' => $validated['claimer_grade'] ?? null,
+            'claimer_id' => $validated['claimer_id'] ?? null,
+            'claim_date' => $validated['claim_date'] ?? now()
+        ]);
 
         // Create history record for claim with authenticated user
         History::create([
@@ -218,7 +228,38 @@ class ItemController extends Controller
     
     public function getAllHistory(): JsonResponse
     {
-        $history = History::orderBy('created_at', 'desc')->get();
+        $history = History::with('item')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($historyRecord) {
+                $item = $historyRecord->item;
+                return [
+                    'id' => $historyRecord->id,
+                    'item_id' => $historyRecord->item_id,
+                    'item_no' => $item->item_no ?? null,
+                    'date' => $historyRecord->date,
+                    'code' => $historyRecord->code,
+                    'item_name' => $historyRecord->item_name,
+                    'category' => $item->category ?? null,
+                    'description' => $item->description ?? null,
+                    'location' => $item->location ?? null,
+                    'date_time' => $item->date_time ?? null,
+                    'image' => $item->image ?? null,
+                    'is_valuable' => $item->is_valuable ?? false,
+                    'finder_name' => $item->finder_name ?? null,
+                    'finder_grade' => $item->finder_grade ?? null,
+                    'finder_id' => $item->finder_id ?? null,
+                    'claimer_name' => $item->claimer_name ?? null,
+                    'claimer_grade' => $item->claimer_grade ?? null,
+                    'claimer_id' => $item->claimer_id ?? null,
+                    'claim_date' => $item->claim_date ?? null,
+                    'owner' => $historyRecord->owner,
+                    'status' => $historyRecord->status,
+                    'officer' => $historyRecord->officer,
+                    'created_at' => $historyRecord->created_at,
+                    'updated_at' => $historyRecord->updated_at
+                ];
+            });
         
         return response()->json([
             'success' => true,

@@ -11,17 +11,17 @@ class PinSeeder extends Seeder
 {
     public function run(): void
     {
-        if (app()->environment('production')) {
-            $this->command->warn('⚠️  Skipping PinSeeder in production for safety.');
-            return;
-        }
-
         if (!Schema::hasTable('pins')) {
             $this->command->error('❌ Table "pins" does not exist.');
             return;
         }
 
-        DB::table('pins')->truncate();
+        // Check if pins already exist
+        $existingPins = DB::table('pins')->where('is_active', true)->count();
+        if ($existingPins > 0) {
+            $this->command->info('✅ Active pins already exist, skipping seeding.');
+            return;
+        }
 
         $pins = [
             [
@@ -50,9 +50,29 @@ class PinSeeder extends Seeder
             ],
         ];
 
-        DB::table('pins')->insert($pins);
+        try {
+            DB::table('pins')->insert($pins);
+            $this->command->info('✅ Pins seeded successfully with hashed values!');
+            
+            // Verify the pins were inserted correctly
+            $insertedCount = DB::table('pins')->where('is_active', true)->count();
+            $this->command->info("📊 Total active pins: {$insertedCount}");
+            
+            // Test hash verification
+            $testPin = DB::table('pins')->where('user_name', 'Admin User')->first();
+            if ($testPin && Hash::check('391847', $testPin->pin_hash)) {
+                $this->command->info('✅ Pin hash verification test passed!');
+            } else {
+                $this->command->error('❌ Pin hash verification test failed!');
+            }
+            
+        } catch (\Exception $e) {
+            $this->command->error('❌ Failed to seed pins: ' . $e->getMessage());
+            throw $e;
+        }
 
-        $this->command->info('✅ Pins seeded successfully with hashed values!');
-        $this->command->warn('⚠️  IMPORTANT: Change these default PINs in production!');
+        if (app()->environment('production')) {
+            $this->command->warn('⚠️  IMPORTANT: Change these default PINs in production!');
+        }
     }
 }

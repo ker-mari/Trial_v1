@@ -70,7 +70,7 @@ const CameraCapture = ({ onCapture, onClose }) => {
     <div className="camera-modal-overlay">
       <div className="camera-modal">
         <button className="modal-close-btn" onClick={onClose}>
-          Close ×
+          ×
         </button>
         <h3>Take Photo</h3>
         

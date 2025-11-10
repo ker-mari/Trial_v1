@@ -20,12 +20,17 @@ class Item extends Model
         'finder_name',
         'finder_grade',
         'finder_id',
+        'claimer_name',
+        'claimer_grade',
+        'claimer_id',
+        'claim_date',
         'officer'
     ];
 
     protected $casts = [
         'is_valuable' => 'boolean',
         'date_time' => 'datetime',
+        'claim_date' => 'datetime',
         'item_no' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'

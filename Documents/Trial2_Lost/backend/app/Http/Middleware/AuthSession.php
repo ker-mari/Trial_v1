@@ -13,9 +13,9 @@ class AuthSession
             return redirect()->route('pin');
         }
         
-        // Check session timeout (30 seconds)
+        // Check session timeout (5 minutes)
         $lastActivity = session('last_activity', 0);
-        if (time() - $lastActivity > 30) {
+        if (time() - $lastActivity > 300) {
             session()->flush();
             return redirect()->route('home');
         }

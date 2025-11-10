@@ -1,0 +1,201 @@
+/* History Page Item Details Modal Styles */
+.history-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.history-modal-content {
+  background: white;
+  border-radius: 12px;
+  padding: 2rem;
+  max-width: 800px;
+  width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.history-modal-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-modal-close-btn:hover {
+  background: #f0f0f0;
+  color: #333;
+}
+
+.history-modal-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 1.5rem;
+  color: #333;
+  text-align: center;
+}
+
+.history-modal-body {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.history-modal-image-container {
+  flex-shrink: 0;
+  width: 200px;
+}
+
+.history-modal-image-placeholder {
+  width: 200px;
+  height: 200px;
+  border: 2px dashed #ddd;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9f9f9;
+}
+
+.history-modal-details-container {
+  flex: 1;
+}
+
+.history-modal-details-container h3 {
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+  color: #333;
+}
+
+.history-modal-category {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.history-modal-info-label {
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.3rem;
+  margin-top: 1rem;
+}
+
+.history-modal-info-label:first-of-type {
+  margin-top: 0;
+}
+
+.history-modal-info-value {
+  color: #333;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+.history-modal-divider {
+  border: none;
+  height: 1px;
+  background: #e0e0e0;
+  margin: 1.5rem 0;
+}
+
+.history-two-column-info {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+
+.history-info-column {
+  flex: 1;
+  min-width: 0;
+}
+
+.history-info-item {
+  margin-bottom: 0.8rem;
+  padding: 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  border-left: 3px solid #007bff;
+}
+
+.history-info-item strong {
+  color: #333;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.history-status-badge {
+  padding: 0.2rem 0.5rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  margin-left: 0.5rem;
+  display: inline-block;
+}
+
+.history-status-badge.claimed {
+  background: #d4edda;
+  color: #155724;
+}
+
+.history-status-badge.available {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.history-status-badge.rejected {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.history-status-badge.default {
+  background: #e2e3e5;
+  color: #495057;
+}
+
+.tagalog-hint {
+  font-size: 0.85em;
+  color: #888;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .history-modal-body {
+    flex-direction: column;
+  }
+  
+  .history-modal-image-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .history-modal-image-placeholder {
+    width: 150px;
+    height: 150px;
+  }
+  
+  .history-two-column-info {
+    flex-direction: column;
+    gap: 1rem;
+  }
+}

@@ -13,6 +13,7 @@ import ItemsToBeCleared from './components/ItemsToBeCleared';
 import ClaimForm from './components/ClaimForm';
 import MainHeader from './components/Header';
 import { ItemDetailsModal, ClaimFormModal, EditFormModal, SuccessModal } from './components/Modals';
+import AppModals from './components/AppModals';
 
  
 
@@ -222,7 +223,13 @@ function App() {
   const handleClaimSubmit = async (claimFormData) => {
     try {
       const { itemsAPI } = await import('./services/api.js');
-      const response = await itemsAPI.claim(selectedItem.id, { owner: claimFormData.ownerName });
+      const response = await itemsAPI.claim(selectedItem.id, {
+        owner: claimFormData.ownerName,
+        claimer_name: claimFormData.ownerName,
+        claimer_grade: claimFormData.ownerGrade,
+        claimer_id: claimFormData.ownerId,
+        claim_date: claimFormData.claimDate
+      });
       
       if (response.data.success) {
         // Update local state to remove claimed item
@@ -379,67 +386,14 @@ function App() {
         {isModalOpen && <ItemDetailsModal selectedItem={selectedItem} onClose={handleCloseModal} onClaim={handleClaimClick} onEdit={handleEditClick} />}
         {isEditFormOpen && <EditFormModal selectedItem={selectedItem} userName={userName} onClose={handleCloseEditForm} onSubmit={handleEditSubmit} />}
         {isSuccessModalOpen && <SuccessModal onClose={handleCloseSuccessModal} onViewHistory={() => { handleCloseSuccessModal(); navigateToScreen('history'); }} />}
-        {isHandOverSuccessModalOpen && (
-          <div className="modal-overlay">
-            <div className="modal-content">
-              <div style={{textAlign: 'center', padding: '2rem'}}>
-                <div style={{
-                  width: '60px',
-                  height: '60px',
-                  backgroundColor: '#4CAF50',
-                  color: 'white',
-                  borderRadius: '50%',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '2rem',
-                  fontWeight: 'bold',
-                  margin: '0 auto 1.5rem'
-                }}>
-                  ✓
-                </div>
-                <h2 style={{color: '#333', fontSize: '1.5rem', marginBottom: '1rem'}}>
-                  Item Handed Over Successfully
-                </h2>
-                <p style={{color: '#666', fontSize: '1rem', lineHeight: '1.5', marginBottom: '2rem'}}>
-                  Now waiting to be reunited with its owner!
-                </p>
-                <button
-                  className="modal-action-btn claim-btn"
-                  onClick={handleCloseHandOverSuccessModal}
-                  style={{minWidth: '120px'}}
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {showEditSuccessModal && (
-          <div className="modal-overlay">
-            <div className="approval-success-modal">
-              <div className="success-content">
-                <div className="success-icon">✓</div>
-                <div style={{ textAlign: 'center' }}>
-                  <h2 style={{ color: '#333', fontSize: '1.5rem', marginBottom: '1rem' }}>
-                    {editSuccessMessage.includes('successfully') ? 'Changes Saved!' : 'Changes Sent!'}
-                  </h2>
-                  <p className="success-message">
-                    {editSuccessMessage.includes('successfully') ? 'Item has been updated successfully.' : 'Your edits have been submitted for admin approval.'}
-                  </p>
-                </div>
-                <button 
-                  className="modal-action-btn claim-btn"
-                  onClick={() => setShowEditSuccessModal(false)}
-                  style={{ marginTop: '1rem' }}
-                >
-                  Continue
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
+        
+        <AppModals 
+          isHandOverSuccessModalOpen={isHandOverSuccessModalOpen}
+          onCloseHandOverSuccessModal={handleCloseHandOverSuccessModal}
+          showEditSuccessModal={showEditSuccessModal}
+          editSuccessMessage={editSuccessMessage}
+          onCloseEditSuccessModal={() => setShowEditSuccessModal(false)}
+        />
       </div>
     </ErrorBoundary>
   );

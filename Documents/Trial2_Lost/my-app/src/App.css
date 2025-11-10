@@ -6,13 +6,13 @@
   font-style: normal;
 }
 
-/* Improve touch scrolling on mobile */
+
 body {
   -webkit-overflow-scrolling: touch;
   overflow-x: hidden;
 }
 
-/* Prevent zoom on input focus on iOS */
+
 input, select, textarea {
   font-size: 16px;
 }
@@ -23,7 +23,7 @@ input, select, textarea {
   }
 }
 
-/* Mobile-first responsive design */
+
 html {
   font-size: 16px;
 }
@@ -420,7 +420,7 @@ html {
   z-index: 2;
 }
 
-/* Dashboard Screen Styles */
+
 .dashboard-screen {
   flex: 1;
   display: flex;
@@ -512,7 +512,7 @@ html {
   margin-top: 35px;
 }
 
-/* Admin Dashboard Specific Styles */
+
 .admin-grid {
   display: flex;
   justify-content: center;
@@ -633,9 +633,6 @@ html {
   vertical-align: middle;
 }
 
-/* ADD THESE STYLES TO YOUR EXISTING App.css FILE */
-
-/* VIEW ITEMS SCREEN STYLES */
 .view-items-screen {
   width: 100%;
   min-height: 100vh;
@@ -663,7 +660,6 @@ html {
   }
 }
 
-/* Search and Filter Container - Optimized for Elderly Users */
 .search-filter-container {
   background: #f0f4f8;
   padding: 1.5rem 2rem;
@@ -829,7 +825,6 @@ html {
   border: 2px solid white;
 }
 
-/* Results Count - Same size as filter buttons */
 .results-count {
   padding: 0.6rem 1.2rem;
   border: 2px solid #002D62;
