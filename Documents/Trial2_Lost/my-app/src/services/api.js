@@ -2,16 +2,16 @@ import axios from 'axios';
 
 // Validate and restrict API base URL to prevent SSRF
 const validateApiUrl = (url) => {
-  const allowedHosts = ['localhost', '127.0.0.1'];
+  const allowedHosts = ['localhost', '127.0.0.1', 'trial-v1-syv7.onrender.com'];
   try {
     const urlObj = new URL(url);
-    return allowedHosts.includes(urlObj.hostname) && urlObj.protocol === 'http:';
+    return allowedHosts.includes(urlObj.hostname) && (urlObj.protocol === 'http:' || urlObj.protocol === 'https:');
   } catch {
     return false;
   }
 };
 
-const defaultUrl = 'http://localhost:8000/api';
+const defaultUrl = 'https://trial-v1-syv7.onrender.com/api';
 const envUrl = import.meta.env.VITE_API_URL;
 const API_BASE_URL = envUrl || defaultUrl;
 
