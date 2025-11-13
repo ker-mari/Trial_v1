@@ -34,12 +34,12 @@ function App() {
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [lastActivity, setLastActivity] = useState(Date.now());
+
   const [isHandOverSuccessModalOpen, setIsHandOverSuccessModalOpen] = useState(false);
   const [showEditSuccessModal, setShowEditSuccessModal] = useState(false);
   const [editSuccessMessage, setEditSuccessMessage] = useState('');
 
-  const SESSION_TIMEOUT = 30 * 1000; // 30 seconds
+
 
   // Restore admin header and auth token on page load
   useEffect(() => {
@@ -74,28 +74,9 @@ function App() {
     }
   }, [screen]);
 
-  useEffect(() => {
-    const checkTimeout = () => {
-      if (sessionStorage.getItem('authenticated') && Date.now() - lastActivity > SESSION_TIMEOUT) {
-        sessionStorage.removeItem('authenticated');
-        setScreen('start');
-        window.history.pushState({}, '', '/');
-      }
-    };
-    const interval = setInterval(checkTimeout, 60000); // Check every minute
-    return () => clearInterval(interval);
-  }, [lastActivity]);
 
-  useEffect(() => {
-    const handleActivity = () => {
-      if (sessionStorage.getItem('authenticated')) {
-        setLastActivity(Date.now());
-      }
-    };
-    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
-    events.forEach(e => document.addEventListener(e, handleActivity, true));
-    return () => events.forEach(e => document.removeEventListener(e, handleActivity, true));
-  }, []);
+
+
 
   const loadItemsFromDatabase = async () => {
     try {
@@ -154,7 +135,7 @@ function App() {
     setIsAdmin(adminStatus);
     sessionStorage.setItem('authenticated', 'true');
     sessionStorage.setItem('isAdmin', adminStatus.toString());
-    setLastActivity(Date.now());
+
 
     // Set auth token and admin header for API requests
     const { setAuthToken, setAdminHeader } = await import('./services/api.js');
