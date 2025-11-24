@@ -9,6 +9,9 @@ const ApprovalQueues = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [successType, setSuccessType] = useState(''); // 'approved' or 'rejected'
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [rejectComment, setRejectComment] = useState('');
+  const [showClearConfirmModal, setShowClearConfirmModal] = useState(false);
 
   useEffect(() => {
     fetchPendingEdits();
@@ -78,15 +81,18 @@ const ApprovalQueues = () => {
     }
   };
 
-  const handleReject = async (e, id) => {
+  const handleRejectClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    setShowRejectModal(true);
+  };
 
+  const handleRejectConfirm = async () => {
     if (processing) return;
 
     setProcessing(true);
     try {
-      await approvalAPI.reject(id);
+      await approvalAPI.reject(selectedEdit.id, { comment: rejectComment });
 
       // Log to history
       const historyEntry = {
@@ -96,7 +102,8 @@ const ApprovalQueues = () => {
         owner: selectedEdit.user_name,
         status: 'Rejected',
         adminApproval: 'Rejected',
-        officer: 'Admin'
+        officer: 'Admin',
+        comment: rejectComment
       };
 
       const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
@@ -109,6 +116,8 @@ const ApprovalQueues = () => {
 
       fetchPendingEdits();
       setSelectedEdit(null);
+      setShowRejectModal(false);
+      setRejectComment('');
 
       // Auto-hide modal after 3 seconds
       setTimeout(() => {
@@ -184,7 +193,7 @@ const ApprovalQueues = () => {
           <div className="approval-modal">
             <button
               className="modal-close-btn"
-              onClick={() => setSelectedEdit(null)}
+              onClick={() => setShowClearConfirmModal(true)}
             >
               ✕
             </button>
@@ -261,10 +270,60 @@ const ApprovalQueues = () => {
               </button>
               <button
                 className="reject-btn"
-                onClick={(e) => handleReject(e, selectedEdit.id)}
+                onClick={handleRejectClick}
                 disabled={processing}
               >
                 ✗ Reject
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showRejectModal && (
+        <div className="pin-modal-overlay" style={{animation: 'modalOverlayFadeIn 0.3s ease-out'}}>
+          <div className="pin-modal" style={{animation: 'modalFadeIn 0.3s ease-out', maxWidth: '550px'}}>
+            <h3 style={{color: '#2c3e50', marginBottom: '1rem', fontSize: '1.3rem'}}>Reject Edit</h3>
+            <p className="pin-modal-text" style={{marginBottom: '1.5rem'}}>
+              Please provide a reason for rejecting this edit (optional):
+            </p>
+            <textarea
+              value={rejectComment}
+              onChange={(e) => setRejectComment(e.target.value)}
+              placeholder="Enter your comment here..."
+              style={{
+                width: '100%',
+                minHeight: '120px',
+                padding: '0.75rem',
+                borderRadius: '12px',
+                border: '2px solid #ddd',
+                fontSize: '1rem',
+                fontFamily: '"Atkinson Hyperlegible", sans-serif',
+                resize: 'vertical',
+                marginBottom: '1.5rem',
+                outline: 'none',
+                transition: 'border-color 0.3s ease'
+              }}
+              onFocus={(e) => e.target.style.borderColor = '#003b6f'}
+              onBlur={(e) => e.target.style.borderColor = '#ddd'}
+            />
+            <div className="pin-modal-buttons">
+              <button
+                className="pin-cancel-btn"
+                onClick={() => {
+                  setShowRejectModal(false);
+                  setRejectComment('');
+                }}
+                disabled={processing}
+              >
+                Cancel
+              </button>
+              <button
+                className="pin-confirm-btn"
+                onClick={handleRejectConfirm}
+                disabled={processing}
+              >
+                {processing ? 'Rejecting...' : 'Confirm Reject'}
               </button>
             </div>
           </div>
@@ -277,6 +336,28 @@ const ApprovalQueues = () => {
             <div className="success-content">
               <div className={`success-icon ${successType}`}>✓</div>
               <p className="success-message">{successMessage}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showClearConfirmModal && (
+        <div className="pin-modal-overlay" style={{animation: 'modalOverlayFadeIn 0.3s ease-out'}}>
+          <div className="pin-modal" style={{animation: 'modalFadeIn 0.3s ease-out'}}>
+            <p className="pin-modal-text">
+              Are you sure you want to close this review? <br />
+              This item will remain in the approval queue.
+            </p>
+            <div className="pin-modal-buttons">
+              <button className="pin-cancel-btn" onClick={() => setShowClearConfirmModal(false)}>
+                Cancel
+              </button>
+              <button className="pin-confirm-btn" onClick={() => {
+                setShowClearConfirmModal(false);
+                setSelectedEdit(null);
+              }}>
+                Confirm
+              </button>
             </div>
           </div>
         </div>

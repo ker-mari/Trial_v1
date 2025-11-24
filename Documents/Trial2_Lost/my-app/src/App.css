@@ -304,15 +304,48 @@ html {
   background: #024e90;
 }
 
+.pin-input-container {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 25px;
+}
+
 .pin-input {
   width: 350px;
   padding: 16px 25px;
+  padding-right: 55px;
   border-radius: 25px;
   border: 1px solid #ccc;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
   font-size: 1.2rem;
   outline: none;
-  margin-bottom: 25px;
+}
+
+.pin-toggle-btn {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666;
+  transition: color 0.3s ease;
+  min-width: 32px;
+  min-height: 32px;
+}
+
+.pin-toggle-btn:hover {
+  color: #003b6f;
+}
+
+.pin-toggle-btn svg {
+  width: 22px;
+  height: 22px;
 }
 
 @media (max-width: 768px) {
@@ -321,6 +354,16 @@ html {
     max-width: 300px;
     font-size: 1rem;
     padding: 14px 20px;
+    padding-right: 50px;
+  }
+
+  .pin-toggle-btn {
+    right: 12px;
+  }
+
+  .pin-toggle-btn svg {
+    width: 20px;
+    height: 20px;
   }
 }
 
@@ -329,6 +372,16 @@ html {
     max-width: 280px;
     font-size: 0.95rem;
     padding: 12px 18px;
+    padding-right: 48px;
+  }
+
+  .pin-toggle-btn {
+    right: 10px;
+  }
+
+  .pin-toggle-btn svg {
+    width: 18px;
+    height: 18px;
   }
 }
 
@@ -337,6 +390,16 @@ html {
     max-width: 260px;
     font-size: 0.9rem;
     padding: 12px 16px;
+    padding-right: 45px;
+  }
+
+  .pin-toggle-btn {
+    right: 8px;
+  }
+
+  .pin-toggle-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 

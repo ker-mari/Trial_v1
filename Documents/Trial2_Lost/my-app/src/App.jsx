@@ -104,7 +104,15 @@ function App() {
       });
       if (response.ok) {
         const data = await response.json();
-        setHistoryItems(data.data || []);
+        const dbHistory = data.data || [];
+
+        // Load localStorage history (contains approval/rejection comments)
+        const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
+
+        // Merge both histories, with localStorage taking precedence for newer items
+        const mergedHistory = [...localHistory, ...dbHistory];
+
+        setHistoryItems(mergedHistory);
       } else {
         if (import.meta.env.DEV) {
           console.error('Failed to load history:', response.status, response.statusText);

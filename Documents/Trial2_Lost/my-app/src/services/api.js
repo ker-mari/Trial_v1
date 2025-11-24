@@ -21,7 +21,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
   },
-  timeout: 5000
+  timeout: 30000 // Increased to 30 seconds for slow backend responses (e.g., cold starts on Render)
 });
 
 // Helper to set authentication token

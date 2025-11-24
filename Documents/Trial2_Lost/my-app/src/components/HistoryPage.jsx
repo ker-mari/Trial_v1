@@ -157,6 +157,23 @@ const HistoryPage = ({ historyItems }) => {
                 <hr className="history-modal-divider" />
                 <p className="history-modal-info-label">Description</p>
                 <p className="history-modal-info-value">{selectedItem.description || 'N/A'}</p>
+                {selectedItem.comment && (
+                  <>
+                    <p className="history-modal-info-label" style={{marginTop: '1rem', color: '#e74c3c'}}>
+                      Admin Comment
+                    </p>
+                    <p className="history-modal-info-value" style={{
+                      padding: '0.75rem',
+                      background: '#fff5f5',
+                      border: '1px solid #ffcccc',
+                      borderRadius: '6px',
+                      color: '#c0392b',
+                      fontStyle: 'italic'
+                    }}>
+                      {selectedItem.comment}
+                    </p>
+                  </>
+                )}
                 <hr className="history-modal-divider" />
                 <div className="history-two-column-info">
                   <div className="history-info-column">
