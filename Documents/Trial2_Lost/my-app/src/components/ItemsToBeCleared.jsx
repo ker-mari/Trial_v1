@@ -10,6 +10,7 @@ const ItemsToBeCleared = () => {
   const [loading, setLoading] = useState(true);
   const [clearing, setClearing] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [dateSort, setDateSort] = useState(null);
 
   useEffect(() => {
     fetchItemsToBeCleared();
@@ -31,10 +32,12 @@ const ItemsToBeCleared = () => {
             day: '2-digit',
             year: 'numeric'
           }),
+          rawDate: itemDate,
           itemName: item.category,
           description: item.description || 'No description available',
           daysPassed: `${daysPassed} days`,
-          officer: 'Officer'
+          officer: 'Officer',
+          code: item.is_valuable ? 'V' : 'L'
         };
       });
       
@@ -93,6 +96,14 @@ const ItemsToBeCleared = () => {
     }
   };
 
+  // Apply date sorting
+  let displayItems = [...items];
+  if (dateSort) {
+    displayItems = displayItems.sort((a, b) => {
+      return dateSort === 'asc' ? a.rawDate - b.rawDate : b.rawDate - a.rawDate;
+    });
+  }
+
   return (
     <div className="screen-layout">
       <div className="items-header">
@@ -101,10 +112,17 @@ const ItemsToBeCleared = () => {
         </button>
       </div>
       <div className="table-container">
+
         <table className="data-table">
           <thead>
             <tr>
-              <th>Date (Handed Over)</th>
+              <th 
+                onClick={() => setDateSort(dateSort === 'asc' ? 'desc' : 'asc')}
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by date"
+              >
+                Date (Handed Over) {dateSort === 'asc' ? '↑' : dateSort === 'desc' ? '↓' : '↕'}
+              </th>
               <th>Item Name</th>
               <th>Description</th>
               <th>Days Passed</th>
@@ -119,10 +137,11 @@ const ItemsToBeCleared = () => {
                   Loading...
                 </td>
               </tr>
-            ) : items.length > 0 ? (
-              items.map((item, index) => (
+            ) : displayItems.length > 0 ? (
+              displayItems.map((item, index) => (
                 <tr key={item.id} className={index % 2 === 1 ? "gray-row" : ""}>
                   <td>{item.date}</td>
+
                   <td>{item.itemName}</td>
                   <td>{item.description}</td>
                   <td>{item.daysPassed}</td>
@@ -137,7 +156,7 @@ const ItemsToBeCleared = () => {
             ) : (
               <tr>
                 <td colSpan="6" style={{ textAlign: 'center', padding: '3rem', color: '#666', fontSize: '1.2rem', fontWeight: 'bold' }}>
-                  List is currently empty.
+                  {items.length === 0 ? 'List is currently empty.' : 'No items match the current filter.'}
                 </td>
               </tr>
             )}

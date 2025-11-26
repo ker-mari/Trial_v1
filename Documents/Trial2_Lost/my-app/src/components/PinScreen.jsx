@@ -84,8 +84,9 @@ const PinScreen = ({ onPinSubmit }) => {
               onClick={handleSubmit}
             >
               {isAuthenticating ? (
-                <span className="authenticating">
-                  Authenticating<span className="dots">...</span>
+                <span className="authenticating" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  <span className="spinner-small"></span>
+                  Authenticating
                 </span>
               ) : (
                 "Proceed"

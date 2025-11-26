@@ -24,26 +24,24 @@ class AuthController extends Controller
 
             $inputPin = trim($request->input('pin'));
 
-            // Check database connection
-            try {
-                DB::connection()->getPdo();
-            } catch (\Exception $e) {
-                Log::error('Database connection failed: ' . $e->getMessage());
-                return response()->json([
-                    'success' => false,
-                    'message' => 'System temporarily unavailable'
-                ], 500);
-            }
-
-            // Get all active pins from database
-            $pins = Pin::where('is_active', true)->get();
+            // Cache active pins for 10 minutes with hash map for faster lookup
+            $pins = Cache::remember('active_pins_hash_map', 600, function () {
+                return Pin::where('is_active', true)
+                    ->select('id', 'pin_hash', 'user_name', 'is_admin')
+                    ->get()
+                    ->keyBy('id');
+            });
 
             if ($pins->isEmpty()) {
                 Log::error('No active pins found in database');
-                // Try to seed pins if none exist
+                // Clear cache and try to seed pins if none exist
+                Cache::forget('active_pins_hash_map');
                 $this->seedDefaultPins();
-                $pins = Pin::where('is_active', true)->get();
-                
+                $pins = Pin::where('is_active', true)
+                    ->select('id', 'pin_hash', 'user_name', 'is_admin')
+                    ->get()
+                    ->keyBy('id');
+
                 if ($pins->isEmpty()) {
                     return response()->json([
                         'success' => false,
@@ -52,41 +50,38 @@ class AuthController extends Controller
                 }
             }
 
-            // Check each pin hash
+            // Fast hash verification with early exit
+            $validPin = null;
             foreach ($pins as $pinRecord) {
-                if (empty($pinRecord->pin_hash)) {
-                    Log::warning('Empty pin hash found for pin ID: ' . $pinRecord->id);
-                    continue;
-                }
-
+                if (empty($pinRecord->pin_hash)) continue;
+                
                 if (Hash::check($inputPin, $pinRecord->pin_hash)) {
-                    // Generate authentication token
-                    $authToken = Str::random(64);
-
-                    // Store session data in cache (30 minutes expiry)
-                    Cache::put('auth_token:' . $authToken, [
-                        'user_name' => $pinRecord->user_name,
-                        'is_admin' => $pinRecord->is_admin,
-                        'pin_id' => $pinRecord->id,
-                        'created_at' => now(),
-                    ], now()->addMinutes(30));
-
-                    Log::info('PIN verified successfully for user: ' . $pinRecord->user_name);
-
-                    return response()->json([
-                        'success' => true,
-                        'user_name' => $pinRecord->user_name,
-                        'is_admin' => $pinRecord->is_admin,
-                        'auth_token' => $authToken,
-                        'expires_in' => 1800, // 30 minutes in seconds
-                        'message' => 'PIN verified successfully'
-                    ]);
+                    $validPin = $pinRecord;
+                    break;
                 }
             }
+            
+            if ($validPin) {
+                // Generate authentication token
+                $authToken = Str::random(32); // Shorter token for faster generation
 
-            Log::warning('Invalid PIN attempt from IP: ' . $request->ip());
+                // Store session data in cache (30 minutes expiry)
+                Cache::put('auth_token:' . $authToken, [
+                    'user_name' => $validPin->user_name,
+                    'is_admin' => $validPin->is_admin,
+                    'pin_id' => $validPin->id,
+                ], 1800); // Direct seconds instead of Carbon
 
-            // Invalid PIN - use constant time to prevent timing attacks
+                return response()->json([
+                    'success' => true,
+                    'user_name' => $validPin->user_name,
+                    'is_admin' => $validPin->is_admin,
+                    'auth_token' => $authToken,
+                    'expires_in' => 1800,
+                    'message' => 'PIN verified successfully'
+                ]);
+            }
+
             return response()->json([
                 'success' => false,
                 'message' => 'Invalid PIN'

@@ -27,6 +27,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ItemSeeder::class,
             PendingEditSeeder::class,
+            HistorySeeder::class,
             PinSeeder::class,  // PinSeeder handles pins seeding
         ]);
     }

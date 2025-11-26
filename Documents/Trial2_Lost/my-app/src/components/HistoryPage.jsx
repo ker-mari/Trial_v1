@@ -17,9 +17,29 @@ const categoryEmojis = {
 
 const HistoryPage = ({ historyItems }) => {
   const [selectedItem, setSelectedItem] = useState(null);
+  const [dateSort, setDateSort] = useState(null); // 'asc' or 'desc'
+  const [codeFilter, setCodeFilter] = useState('all'); // 'all', 'V', 'L'
+  
+  const handleCodeClick = () => {
+    setCodeFilter(codeFilter === 'all' ? 'V' : codeFilter === 'V' ? 'L' : 'all');
+  };
   
   // Filter out 'Handed Over' items
-  const filteredItems = historyItems?.filter(item => item.status !== 'Handed Over') || [];
+  let filteredItems = historyItems?.filter(item => item.status !== 'Handed Over') || [];
+  
+  // Apply code filter
+  if (codeFilter !== 'all') {
+    filteredItems = filteredItems.filter(item => item.code === codeFilter);
+  }
+  
+  // Apply date sorting
+  if (dateSort) {
+    filteredItems = [...filteredItems].sort((a, b) => {
+      const dateA = new Date(a.created_at || a.date);
+      const dateB = new Date(b.created_at || b.date);
+      return dateSort === 'asc' ? dateA - dateB : dateB - dateA;
+    });
+  }
 
   // Helper function to format date and time
   const formatDateTime = (dateString) => {
@@ -54,12 +74,25 @@ const HistoryPage = ({ historyItems }) => {
   return (
     <div className="screen-layout">
       <div className="table-container history-table">
+
         <table className="data-table">
           <thead>
             <tr>
-              <th>Date</th>
+              <th 
+                onClick={() => setDateSort(dateSort === 'asc' ? 'desc' : 'asc')}
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to sort by date"
+              >
+                Date {dateSort === 'asc' ? '↑' : dateSort === 'desc' ? '↓' : '↕'}
+              </th>
               <th>Time</th>
-              <th>Code</th>
+              <th 
+                onClick={handleCodeClick}
+                style={{ cursor: 'pointer', userSelect: 'none' }}
+                title="Click to filter by code"
+              >
+                Code {codeFilter === 'all' ? '↕' : codeFilter === 'V' ? '↑' : '↓'}
+              </th>
               <th>Item Name</th>
               <th>Owner</th>
               <th style={{textAlign: 'center'}}>Status</th>
@@ -91,9 +124,10 @@ const HistoryPage = ({ historyItems }) => {
                     <td>{item.owner || 'N/A'}</td>
                     <td style={{textAlign: 'center'}}>
                       <span className={`status-text ${
-                        item.status === 'Claimed' || item.status === 'Edit Approved' ? 'status-claimed' :
+                        item.status === 'Claimed' || item.status === 'Approved' || item.status === 'Edit Approved' ? 'status-claimed' :
                         item.status === 'Available' ? 'status-claimable' :
-                        item.status === 'Edit Rejected' ? 'status-rejected' : ''
+                        item.status === 'Rejected' || item.status === 'Edit Rejected' ? 'status-rejected' :
+                        item.status === 'Admin Edit' ? 'status-admin-edit' : ''
                       }`}>
                         {item.status === 'Available' ? 'Claimable' : item.status || 'N/A'}
                       </span>
@@ -205,9 +239,10 @@ const HistoryPage = ({ historyItems }) => {
                     <div className="history-info-item">
                       <strong>Status:</strong> 
                       <span className={`history-status-badge ${
-                        selectedItem.status === 'Claimed' || selectedItem.status === 'Edit Approved' ? 'claimed' :
+                        selectedItem.status === 'Claimed' || selectedItem.status === 'Approved' || selectedItem.status === 'Edit Approved' ? 'claimed' :
                         selectedItem.status === 'Available' ? 'available' :
-                        selectedItem.status === 'Edit Rejected' ? 'rejected' : 'default'
+                        selectedItem.status === 'Rejected' || selectedItem.status === 'Edit Rejected' ? 'rejected' :
+                        selectedItem.status === 'Admin Edit' ? 'admin-edit' : 'default'
                       }`}>
                         {selectedItem.status === 'Available' ? 'Claimable' : selectedItem.status || 'N/A'}
                       </span>

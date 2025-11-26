@@ -229,14 +229,18 @@ export const ClaimFormModal = ({ selectedItem, userName, onClose, onSubmit }) =>
 };
 
 export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => {
-  const [editFormData, setEditFormData] = useState({
+  const originalData = {
     category: selectedItem?.category || '',
     date: selectedItem?.found_date || selectedItem?.date_time || selectedItem?.created_at || '',
     location: selectedItem?.location || '',
     description: selectedItem?.description || ''
-  });
+  };
+  
+  const [editFormData, setEditFormData] = useState(originalData);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  
+  const hasChanges = JSON.stringify(editFormData) !== JSON.stringify(originalData);
 
   const updateEditFormData = (field, value) => {
     setEditFormData(prev => ({ ...prev, [field]: value }));
@@ -357,7 +361,18 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
         
         <div className="edit-modal-footer">
           <button className="edit-cancel-btn" onClick={onClose}>Cancel</button>
-          <button className="edit-save-btn" onClick={handleSubmit}>Save Changes</button>
+          <div className="button-wrapper">
+            <button 
+              className={`edit-save-btn ${!hasChanges ? 'disabled' : ''}`} 
+              onClick={handleSubmit}
+              disabled={!hasChanges}
+            >
+              Save Changes
+            </button>
+            {!hasChanges && (
+              <div className="tooltip">No changes made</div>
+            )}
+          </div>
         </div>
       </div>
 
