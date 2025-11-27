@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './HistoryPage.css';
 
 const categoryEmojis = {
@@ -20,11 +20,31 @@ const HistoryPage = ({ historyItems }) => {
   const [dateSort, setDateSort] = useState(null); // 'asc' or 'desc'
   const [codeFilter, setCodeFilter] = useState('all'); // 'all', 'V', 'L'
   
+  useEffect(() => {
+    document.body.style.overflow = 'hidden';
+    
+    // Poll for updates every 5 seconds
+    const interval = setInterval(() => {
+      if (window.location.pathname === '/history') {
+        window.location.reload();
+      }
+    }, 5000);
+    
+    return () => {
+      document.body.style.overflow = 'auto';
+      clearInterval(interval);
+    };
+  }, []);
+  
   const handleCodeClick = () => {
     setCodeFilter(codeFilter === 'all' ? 'V' : codeFilter === 'V' ? 'L' : 'all');
   };
   
-  // Filter out 'Handed Over' items
+  const handleDateClick = () => {
+    setDateSort(dateSort === null ? 'asc' : dateSort === 'asc' ? 'desc' : null);
+  };
+  
+  // Filter out 'Handed Over' items only
   let filteredItems = historyItems?.filter(item => item.status !== 'Handed Over') || [];
   
   // Apply code filter
@@ -32,14 +52,14 @@ const HistoryPage = ({ historyItems }) => {
     filteredItems = filteredItems.filter(item => item.code === codeFilter);
   }
   
-  // Apply date sorting
-  if (dateSort) {
-    filteredItems = [...filteredItems].sort((a, b) => {
-      const dateA = new Date(a.created_at || a.date);
-      const dateB = new Date(b.created_at || b.date);
-      return dateSort === 'asc' ? dateA - dateB : dateB - dateA;
-    });
-  }
+  // Apply date sorting (default to newest first)
+  filteredItems = [...filteredItems].sort((a, b) => {
+    const dateA = new Date(a.created_at || a.date);
+    const dateB = new Date(b.created_at || b.date);
+    if (dateSort === 'asc') return dateA - dateB;
+    if (dateSort === 'desc') return dateB - dateA;
+    return dateB - dateA; // Default: newest first
+  });
 
   // Helper function to format date and time
   const formatDateTime = (dateString) => {
@@ -72,14 +92,14 @@ const HistoryPage = ({ historyItems }) => {
   };
 
   return (
-    <div className="screen-layout">
-      <div className="table-container history-table">
+    <div className="screen-layout no-scroll">
+      <div className="table-container history-table" data-rows={filteredItems.length}>
 
         <table className="data-table">
           <thead>
             <tr>
               <th 
-                onClick={() => setDateSort(dateSort === 'asc' ? 'desc' : 'asc')}
+                onClick={handleDateClick}
                 style={{ cursor: 'pointer', userSelect: 'none' }}
                 title="Click to sort by date"
               >
@@ -91,7 +111,7 @@ const HistoryPage = ({ historyItems }) => {
                 style={{ cursor: 'pointer', userSelect: 'none' }}
                 title="Click to filter by code"
               >
-                Code {codeFilter === 'all' ? '↕' : codeFilter === 'V' ? '↑' : '↓'}
+                Code {codeFilter === 'all' ? '(All)' : codeFilter === 'V' ? '(V)' : '(L)'}
               </th>
               <th>Item Name</th>
               <th>Owner</th>
@@ -125,11 +145,10 @@ const HistoryPage = ({ historyItems }) => {
                     <td style={{textAlign: 'center'}}>
                       <span className={`status-text ${
                         item.status === 'Claimed' || item.status === 'Approved' || item.status === 'Edit Approved' ? 'status-claimed' :
-                        item.status === 'Available' ? 'status-claimable' :
                         item.status === 'Rejected' || item.status === 'Edit Rejected' ? 'status-rejected' :
                         item.status === 'Admin Edit' ? 'status-admin-edit' : ''
                       }`}>
-                        {item.status === 'Available' ? 'Claimable' : item.status || 'N/A'}
+                        {item.status === 'Admin Edit' ? 'Admin Update' : item.status || 'N/A'}
                       </span>
                     </td>
                     <td>{item.officer || 'N/A'}</td>
@@ -240,11 +259,10 @@ const HistoryPage = ({ historyItems }) => {
                       <strong>Status:</strong> 
                       <span className={`history-status-badge ${
                         selectedItem.status === 'Claimed' || selectedItem.status === 'Approved' || selectedItem.status === 'Edit Approved' ? 'claimed' :
-                        selectedItem.status === 'Available' ? 'available' :
                         selectedItem.status === 'Rejected' || selectedItem.status === 'Edit Rejected' ? 'rejected' :
                         selectedItem.status === 'Admin Edit' ? 'admin-edit' : 'default'
                       }`}>
-                        {selectedItem.status === 'Available' ? 'Claimable' : selectedItem.status || 'N/A'}
+                        {selectedItem.status === 'Admin Edit' ? 'Admin Update' : selectedItem.status || 'N/A'}
                       </span>
                     </div>
                   </div>

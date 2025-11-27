@@ -14,6 +14,10 @@ const ItemsToBeCleared = () => {
 
   useEffect(() => {
     fetchItemsToBeCleared();
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, []);
 
   const fetchItemsToBeCleared = async () => {
@@ -105,19 +109,19 @@ const ItemsToBeCleared = () => {
   }
 
   return (
-    <div className="screen-layout">
+    <div className="screen-layout no-scroll">
       <div className="items-header">
         <button onClick={() => setShowConfirmModal(true)} className="clear-all-btn" disabled={items.length === 0}>
           Clear all
         </button>
       </div>
-      <div className="table-container">
+      <div className="table-container" data-rows={displayItems.length}>
 
         <table className="data-table">
           <thead>
             <tr>
               <th 
-                onClick={() => setDateSort(dateSort === 'asc' ? 'desc' : 'asc')}
+                onClick={() => setDateSort(dateSort === null ? 'asc' : dateSort === 'asc' ? 'desc' : null)}
                 style={{ cursor: 'pointer', userSelect: 'none' }}
                 title="Click to sort by date"
               >

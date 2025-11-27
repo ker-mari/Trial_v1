@@ -25,7 +25,7 @@ const ViewItems = ({ items, onViewDetails }) => {
     return item.is_valuable || valuableCategories.includes(item.category);
   };
 
-  // Filter items based on search query and code filter
+  // Filter items based on search query and code filter, sort newest to oldest
   const filteredItems = useMemo(() => {
     return items.filter(item => {
       // Code filter (L = Lost/Regular, V = Valuable)
@@ -42,6 +42,10 @@ const ViewItems = ({ items, onViewDetails }) => {
         item.location?.toLowerCase().includes(query) ||
         String(item.item_no || item.itemNo || item.id).toLowerCase().includes(query)
       );
+    }).sort((a, b) => {
+      const dateA = new Date(a.created_at || a.date_time || a.date);
+      const dateB = new Date(b.created_at || b.date_time || b.date);
+      return dateB - dateA; // Newest first
     });
   }, [items, searchQuery, codeFilter]);
 

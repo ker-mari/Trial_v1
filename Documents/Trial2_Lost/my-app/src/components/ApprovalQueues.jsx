@@ -9,12 +9,26 @@ const ApprovalQueues = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [successType, setSuccessType] = useState(''); // 'approved' or 'rejected'
+  const [dateSort, setDateSort] = useState(null);
+  const [codeFilter, setCodeFilter] = useState('all');
+  
+  const handleDateClick = () => {
+    setDateSort(dateSort === null ? 'asc' : dateSort === 'asc' ? 'desc' : null);
+  };
+  
+  const handleCodeClick = () => {
+    setCodeFilter(codeFilter === 'all' ? 'V' : codeFilter === 'V' ? 'L' : 'all');
+  };
   const [showRejectModal, setShowRejectModal] = useState(false);
   const [rejectComment, setRejectComment] = useState('');
   const [showClearConfirmModal, setShowClearConfirmModal] = useState(false);
 
   useEffect(() => {
     fetchPendingEdits();
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.overflow = 'auto';
+    };
   }, []);
 
   const fetchPendingEdits = async () => {
@@ -134,14 +148,26 @@ const ApprovalQueues = () => {
   };
 
   return (
-    <div className="screen-layout">
-      <div className="table-container">
+    <div className="screen-layout no-scroll">
+      <div className="table-container approval-table" data-rows={pendingEdits.length}>
           <table className="data-table">
             <thead>
               <tr>
-                <th>Date <span className="sort-icon">↑</span></th>
+                <th 
+                  onClick={handleDateClick}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                  title="Click to sort by date"
+                >
+                  Date {dateSort === 'asc' ? '↑' : dateSort === 'desc' ? '↓' : '↕'}
+                </th>
                 <th>Time</th>
-                <th>Code <span className="sort-icon">↓</span></th>
+                <th 
+                  onClick={handleCodeClick}
+                  style={{ cursor: 'pointer', userSelect: 'none' }}
+                  title="Click to filter by code"
+                >
+                  Code {codeFilter === 'all' ? '(All)' : codeFilter === 'V' ? '(V)' : '(L)'}
+                </th>
                 <th>Item Name</th>
                 <th>Status</th>
                 <th>Officer</th>
@@ -151,9 +177,30 @@ const ApprovalQueues = () => {
             <tbody>
               {loading ? (
                 <tr><td colSpan="7" style={{textAlign: 'center', padding: '3rem', fontSize: '1.1rem'}}>Loading...</td></tr>
-              ) : pendingEdits.length === 0 ? (
-                <tr><td colSpan="7" style={{textAlign: 'center', padding: '3rem', color: '#666', fontSize: '1.2rem', fontWeight: 'bold'}}>No pending approvals at the moment.</td></tr>
-              ) : pendingEdits.map((edit, index) => (
+              ) : (() => {
+                // Apply filters and sorting
+                let filteredEdits = [...pendingEdits];
+                
+                // Apply code filter
+                if (codeFilter !== 'all') {
+                  filteredEdits = filteredEdits.filter(edit => {
+                    const isValuable = edit.new_data?.is_valuable || edit.original_data?.is_valuable;
+                    return codeFilter === 'V' ? isValuable : !isValuable;
+                  });
+                }
+                
+                // Apply date sorting
+                if (dateSort) {
+                  filteredEdits = filteredEdits.sort((a, b) => {
+                    const dateA = new Date(a.created_at);
+                    const dateB = new Date(b.created_at);
+                    return dateSort === 'asc' ? dateA - dateB : dateB - dateA;
+                  });
+                }
+                
+                return filteredEdits.length === 0 ? (
+                  <tr><td colSpan="7" style={{textAlign: 'center', padding: '3rem', color: '#666', fontSize: '1.2rem', fontWeight: 'bold'}}>No pending approvals at the moment.</td></tr>
+                ) : filteredEdits.map((edit, index) => (
                 <tr key={edit.id} className={index % 2 === 1 ? "gray-row" : ""}>
                   <td>{new Date(edit.created_at).toLocaleDateString('en-US', { 
                     month: 'short', 
@@ -183,7 +230,8 @@ const ApprovalQueues = () => {
                     </button>
                   </td>
                 </tr>
-              ))}
+              ));
+              })()}
             </tbody>
           </table>
         </div>

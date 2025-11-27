@@ -34,20 +34,10 @@ class AuthController extends Controller
 
             if ($pins->isEmpty()) {
                 Log::error('No active pins found in database');
-                // Clear cache and try to seed pins if none exist
-                Cache::forget('active_pins_hash_map');
-                $this->seedDefaultPins();
-                $pins = Pin::where('is_active', true)
-                    ->select('id', 'pin_hash', 'user_name', 'is_admin')
-                    ->get()
-                    ->keyBy('id');
-
-                if ($pins->isEmpty()) {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Authentication system not configured'
-                    ], 500);
-                }
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Authentication system not configured'
+                ], 500);
             }
 
             // Fast hash verification with early exit
@@ -96,42 +86,7 @@ class AuthController extends Controller
         }
     }
 
-    private function seedDefaultPins()
-    {
-        try {
-            $defaultPins = [
-                [
-                    'pin_hash' => Hash::make('847293'),
-                    'user_name' => 'Mr. Guard 1',
-                    'is_admin' => false,
-                    'is_active' => true,
-                ],
-                [
-                    'pin_hash' => Hash::make('562018'),
-                    'user_name' => 'Ms. Guard 2',
-                    'is_admin' => false,
-                    'is_active' => true,
-                ],
-                [
-                    'pin_hash' => Hash::make('391847'),
-                    'user_name' => 'Admin User',
-                    'is_admin' => true,
-                    'is_active' => true,
-                ],
-            ];
 
-            foreach ($defaultPins as $pinData) {
-                Pin::firstOrCreate(
-                    ['user_name' => $pinData['user_name']],
-                    $pinData
-                );
-            }
-
-            Log::info('Default pins seeded successfully');
-        } catch (\Exception $e) {
-            Log::error('Failed to seed default pins: ' . $e->getMessage());
-        }
-    }
 
     public function logout(Request $request): JsonResponse
     {

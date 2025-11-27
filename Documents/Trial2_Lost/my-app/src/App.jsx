@@ -19,8 +19,20 @@ import AppModals from './components/AppModals';
 
 function App() {
   const [screen, setScreen] = useState(() => {
-    sessionStorage.removeItem('authenticated');
-    window.history.pushState({}, '', '/');
+    // Check if user is authenticated
+    if (sessionStorage.getItem('authenticated')) {
+      // Determine screen based on current URL
+      const path = window.location.pathname;
+      if (path === '/dashboard') return 'dashboard';
+      if (path === '/view-items') return 'viewItems';
+      if (path === '/hand-over') return 'handOver';
+      if (path === '/history') return 'history';
+      if (path === '/approval-queues') return 'approvalQueues';
+      if (path === '/items-to-be-cleared') return 'itemsToBeCleared';
+      if (path === '/claim-form') return 'claimForm';
+      if (path === '/pin') return 'pin';
+      return 'dashboard'; // Default to dashboard if authenticated
+    }
     return 'start';
   });
 
@@ -45,7 +57,12 @@ function App() {
   useEffect(() => {
     const restoreAuthState = async () => {
       const storedIsAdmin = sessionStorage.getItem('isAdmin') === 'true';
+      const storedUserName = sessionStorage.getItem('userName');
       const storedAuthToken = sessionStorage.getItem('authToken');
+
+      if (storedUserName) {
+        setUserName(storedUserName);
+      }
 
       if (storedIsAdmin) {
         const { setAdminHeader } = await import('./services/api.js');
@@ -54,12 +71,6 @@ function App() {
       }
 
       // Auth token is automatically restored in api.js
-      // Just verify it exists
-      if (!storedAuthToken && sessionStorage.getItem('authenticated')) {
-        // Session exists but no token - force re-login
-        sessionStorage.removeItem('authenticated');
-        setScreen('start');
-      }
     };
     restoreAuthState();
   }, []);
@@ -143,7 +154,7 @@ function App() {
     setIsAdmin(adminStatus);
     sessionStorage.setItem('authenticated', 'true');
     sessionStorage.setItem('isAdmin', adminStatus.toString());
-
+    sessionStorage.setItem('userName', name);
 
     // Set auth token and admin header for API requests
     const { setAuthToken, setAdminHeader } = await import('./services/api.js');

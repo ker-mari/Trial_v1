@@ -2136,12 +2136,30 @@ input[type="time"].form-input-large.error {
 .table-container {
   background: white;
   border-radius: 15px;
-  padding: 1rem;
+  padding: 0 1rem 1rem 1rem;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   border: 3px solid #4a90e2;
-  max-height: 80vh;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
+
+.table-container[data-rows="0"],
+.table-container[data-rows="1"] {
+  height: auto;
+  max-height: none;
+}
+
+.table-container[data-rows="2"],
+.table-container[data-rows="3"] {
+  height: auto;
+  max-height: none;
+}
+
+.table-container:not([data-rows="0"]):not([data-rows="1"]):not([data-rows="2"]):not([data-rows="3"]) {
+  max-height: 80vh;
+}
+
+
 
 @media (max-width: 768px) {
   .table-container {
@@ -2157,12 +2175,19 @@ input[type="time"].form-input-large.error {
 
 .table-container.approval-table .data-table {
   table-layout: fixed;
+  width: 100%;
 }
 
 .table-container.approval-table .data-table th,
 .table-container.approval-table .data-table td {
-  width: 16.66%;
   text-align: center;
+  padding: 1rem 0.5rem;
+  width: 14.28%;
+  vertical-align: middle;
+}
+
+.table-container.approval-table {
+  opacity: 1;
 }
 
 .table-container .data-table {
@@ -2222,10 +2247,20 @@ input[type="time"].form-input-large.error {
 .data-table th {
   background: #f8f9fa;
   padding: 1rem;
+  margin-top: 1rem;
   text-align: left;
   font-weight: 600;
   color: #333;
-  border-bottom: 2px solid #e9ecef;
+  border-bottom: 3px solid #e9ecef;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+}
+
+.data-table tbody {
+  margin-top: 1rem;
 }
 
 .data-table td {
@@ -2439,6 +2474,29 @@ input[type="time"].form-input-large.error {
   padding: 2rem;
   overflow-x: hidden;
   overflow-y: auto;
+}
+
+.screen-layout.no-scroll {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.screen-layout.no-scroll .table-container {
+  min-height: 0;
+}
+
+.screen-layout.no-scroll .table-container[data-rows="0"],
+.screen-layout.no-scroll .table-container[data-rows="1"],
+.screen-layout.no-scroll .table-container[data-rows="2"],
+.screen-layout.no-scroll .table-container[data-rows="3"] {
+  flex: none;
+  height: auto;
+}
+
+.screen-layout.no-scroll .table-container:not([data-rows="0"]):not([data-rows="1"]):not([data-rows="2"]):not([data-rows="3"]) {
+  flex: 1;
 }
 
 @media (max-width: 768px) {
@@ -2842,6 +2900,11 @@ p {
   border-top-color: white;
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 @keyframes dots {
