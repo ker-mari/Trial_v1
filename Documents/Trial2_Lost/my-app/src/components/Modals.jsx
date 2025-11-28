@@ -41,7 +41,7 @@ export const ItemDetailsModal = ({ selectedItem, onClose, onClaim, onEdit }) => 
             </div>
           </div>
           <div className="modal-details-container">
-            <h3>Item no. {selectedItem.itemNo || String(selectedItem.id).padStart(5, '0')}</h3>
+            <h3>Item no. {selectedItem.itemNo || selectedItem.id}</h3>
             <p className="modal-category">{selectedItem.category}</p>
             <p className="modal-info-label">Location Found</p>
             <p className="modal-info-value">{selectedItem.location}</p>

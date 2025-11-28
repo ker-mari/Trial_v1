@@ -12,17 +12,24 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Create test PINs
+        // Create PINs
         Pin::create([
-            'pin_hash' => Hash::make('1234'),
-            'user_name' => 'Test Guard',
+            'pin_hash' => Hash::make('847293'),
+            'user_name' => 'Bro. Ed',
             'is_admin' => false,
             'is_active' => true,
         ]);
 
         Pin::create([
-            'pin_hash' => Hash::make('5678'),
-            'user_name' => 'Test Admin',
+            'pin_hash' => Hash::make('562018'),
+            'user_name' => 'Bro. Ramon',
+            'is_admin' => false,
+            'is_active' => true,
+        ]);
+
+        Pin::create([
+            'pin_hash' => Hash::make('391847'),
+            'user_name' => 'Mrs. Laura Sabillion',
             'is_admin' => true,
             'is_active' => true,
         ]);
