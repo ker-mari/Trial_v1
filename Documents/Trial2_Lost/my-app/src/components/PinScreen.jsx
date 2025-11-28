@@ -6,6 +6,7 @@ const PinScreen = ({ onPinSubmit }) => {
   const [showModal, setShowModal] = useState(false);
   const [isAuthenticating, setIsAuthenticating] = useState(false);
   const [showPin, setShowPin] = useState(false);
+  const [showTooltip, setShowTooltip] = useState(false);
 
   const handleSubmit = async () => {
     setIsAuthenticating(true);
@@ -78,20 +79,25 @@ const PinScreen = ({ onPinSubmit }) => {
                 )}
               </button>
             </div>
-            <button
-              className={pin ? "proceed-btn active" : "proceed-btn"}
-              disabled={!pin || isAuthenticating}
-              onClick={handleSubmit}
-            >
-              {isAuthenticating ? (
-                <span className="authenticating" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                  <span className="spinner-small"></span>
-                  Authenticating
-                </span>
-              ) : (
-                "Proceed"
+            <div className="button-wrapper">
+              <button
+                className={pin ? "proceed-btn active" : "proceed-btn"}
+                disabled={!pin || isAuthenticating}
+                onClick={handleSubmit}
+              >
+                {isAuthenticating ? (
+                  <span className="authenticating" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                    <span className="spinner-small"></span>
+                    Authenticating
+                  </span>
+                ) : (
+                  "Proceed"
+                )}
+              </button>
+              {!pin && (
+                <div className="tooltip">Please enter a PIN</div>
               )}
-            </button>
+            </div>
           </div>
           <div className="image-side">
             <div className="img-bg"></div>
