@@ -15,7 +15,9 @@ class ItemController extends Controller
 
     public function index(): JsonResponse
     {
-        $items = Item::available()->get();
+        $items = Item::where('status', 'available')
+                    ->orderBy('created_at', 'desc')
+                    ->get();
         return response()->json([
             'data' => $items
         ]);
@@ -168,13 +170,21 @@ class ItemController extends Controller
             ], 400);
         }
 
-        $validated = $request->validate([
-            'owner' => 'required|string|max:100',
-            'claimer_name' => 'nullable|string|max:100',
-            'claimer_grade' => 'nullable|string|max:100',
-            'claimer_id' => 'nullable|string|max:50',
-            'claim_date' => 'nullable|date'
-        ]);
+        try {
+            $validated = $request->validate([
+                'owner' => 'required|string|max:100',
+                'claimer_name' => 'nullable|string|max:100',
+                'claimer_grade' => 'nullable|string|max:100',
+                'claimer_id' => 'nullable|string|max:50',
+                'claim_date' => 'nullable|date'
+            ]);
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Validation failed',
+                'errors' => $e->errors()
+            ], 400);
+        }
 
         $item->update([
             'status' => 'claimed',
@@ -229,6 +239,7 @@ class ItemController extends Controller
     public function getAllHistory(): JsonResponse
     {
         $history = History::with('item')
+            ->whereNotIn('status', ['Approved', 'Rejected', 'Handed Over'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($historyRecord) {

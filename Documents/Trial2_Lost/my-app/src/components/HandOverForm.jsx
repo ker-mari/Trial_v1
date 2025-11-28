@@ -17,6 +17,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
     category: 'Item',
     date: getCurrentDateTime(),
     location: 'Location',
+    customLocation: '',
     description: '',
     finderName: '',
     finderGrade: '',
@@ -32,6 +33,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
   const [showCamera, setShowCamera] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const updateFormData = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -44,8 +46,11 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
     setDropdowns(prev => ({ ...prev, [dropdown]: !prev[dropdown] }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     const newErrors = {};
     
     if (!formData.finderName) newErrors.finderName = true;
@@ -54,6 +59,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
     if (formData.category === 'Item') newErrors.category = true;
     if (!formData.date) newErrors.date = true;
     if (formData.location === 'Location') newErrors.location = true;
+    if (formData.location === 'Others:' && !formData.customLocation) newErrors.customLocation = true;
     if (!formData.description) newErrors.description = true;
     
     setErrors(newErrors);
@@ -61,16 +67,32 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
     if (Object.keys(newErrors).length > 0) {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
+      setIsSubmitting(false);
       return;
     }
     
+    const valuableCategories = [
+      'Gadgets / Electronics',
+      'Money and Payment Items', 
+      'Identification and Wallets',
+      'Bags and Storage',
+      'Jewelry / Valuables'
+    ];
+    
     const submitData = {
       ...formData,
+      location: formData.location === 'Others:' ? formData.customLocation : formData.location,
+      image: valuableCategories.includes(formData.category) ? '' : formData.image,
       officer: userName
     };
     console.log('Submitting formData:', submitData);
     console.log('Image data length:', formData.image ? formData.image.length : 'No image');
-    onSubmit(submitData);
+    
+    try {
+      await onSubmit(submitData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -106,7 +128,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
           
           <div className="form-grid">
             <div className="form-field">
-              <label>Student's Name <span className="tagalog-hint">(Pangalan ng Studyante)</span> <span className="required">*</span></label>
+              <label>Finder's Name <span className="tagalog-hint">(Pangalan ng nakakita)</span> <span className="required">*</span></label>
               <input 
                 type="text" 
                 name="finderName" 
@@ -118,7 +140,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
             </div>
             
             <div className="form-field">
-              <label>Student's ID Number <span className="tagalog-hint">(ID Number ng Studyante)</span> <span className="required">*</span></label>
+              <label>Finder's ID Number <span className="tagalog-hint">(ID Number ng nakakita)</span> <span className="required">*</span></label>
               <input 
                 type="text" 
                 name="finderId" 
@@ -130,7 +152,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
             </div>
             
             <div className="form-field">
-              <label>Grade/Course <span className="tagalog-hint">(Baitang - Seksyon o Kurso)</span> <span className="required">*</span></label>
+              <label>Grade Section/ Course/ Role <span className="tagalog-hint">(Baitang - Seksyon/ Kurso/ Katungkulan)</span> <span className="required">*</span></label>
               <input 
                 type="text" 
                 name="finderGrade" 
@@ -222,9 +244,12 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
                 </div>
                 {dropdowns.location && (
                   <div className="dropdown-menu scrollable">
-                    {['Entrance Lobby', 'Lobby 2 (Lost and Found Location)', 'EFS 1st Floor', 'EFS 2nd Floor', 'EFS 3rd Floor', 'EFS 4th Floor', 'DSR 1st Floor', 'DSR 2nd Floor', 'DSR 3rd Floor', 'DSR 4th Floor'].map(location => (
+                    {['Entrance Lobby', 'Lobby 2 (Lost and Found Location)', 'EFS 1st Floor', 'EFS 2nd Floor', 'EFS 3rd Floor', 'EFS 4th Floor', 'DSR 1st Floor', 'DSR 2nd Floor', 'DSR 3rd Floor', 'DSR 4th Floor', 'Others:'].map(location => (
                       <div key={location} className="dropdown-item" onClick={() => {
                         updateFormData('location', location);
+                        if (location !== 'Others:') {
+                          updateFormData('customLocation', '');
+                        }
                         toggleDropdown('location');
                       }}>
                         {location}
@@ -233,6 +258,17 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
                   </div>
                 )}
               </div>
+              
+              {formData.location === 'Others:' && (
+                <input 
+                  type="text" 
+                  placeholder="Enter specific location" 
+                  className={`form-input ${errors.customLocation ? 'error' : ''}`}
+                  value={formData.customLocation}
+                  onChange={(e) => updateFormData('customLocation', e.target.value)}
+                  style={{marginTop: '0.5rem'}}
+                />
+              )}
             </div>
             
             <div className="form-field">
@@ -241,6 +277,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
                 type="datetime-local" 
                 className={`form-input ${errors.date ? 'error' : ''}`}
                 placeholder="Select date and time"
+                min="2025-01-01T00:00"
                 value={formData.date}
                 onChange={(e) => updateFormData('date', e.target.value)}
               />
@@ -251,7 +288,9 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
 
           <div className="form-footer">
             <button type="button" className="cancel-btn" onClick={handleCancel}>Cancel</button>
-            <button type="submit" className={`submit-btn ${formData.finderName && formData.finderGrade && formData.finderId && formData.category !== 'Item' && formData.date && formData.description ? 'active' : ''}`}>Submit</button>
+            <button type="submit" disabled={isSubmitting} className={`submit-btn ${formData.finderName && formData.finderGrade && formData.finderId && formData.category !== 'Item' && formData.date && formData.description && !isSubmitting ? 'active' : ''}`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
           </div>
         </form>
       </div>

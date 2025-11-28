@@ -82,6 +82,7 @@ const CameraCapture = ({ onCapture, onClose }) => {
               screenshotFormat="image/jpeg"
               width={400}
               height={300}
+              style={{objectFit: 'contain'}}
             />
             <button className="capture-btn" onClick={capture}>
               📷 Capture
@@ -89,7 +90,7 @@ const CameraCapture = ({ onCapture, onClose }) => {
           </div>
         ) : (
           <div className="preview-container">
-            <img src={capturedImage} alt="Captured" width={400} height={300} />
+            <img src={capturedImage} alt="Captured" width={400} height={300} style={{objectFit: 'contain'}} />
             <div className="preview-actions">
               <button className="retake-btn" onClick={handleRetake}>
                 Retake

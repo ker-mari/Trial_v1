@@ -957,6 +957,76 @@ html {
   cursor: pointer;
 }
 
+.logout-section {
+  display: flex;
+  align-items: center;
+}
+
+.logout-btn {
+  background: transparent;
+  border: 2px solid white;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 25px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+}
+
+.logout-btn:hover {
+  background: white;
+  color: #003b6f;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.3);
+}
+
+.logout-btn .btn-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 0;
+}
+
+@media (max-width: 768px) {
+  .logout-btn {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+  }
+  
+  .logout-btn .btn-icon {
+    width: 18px;
+    height: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .logout-btn {
+    font-size: 0.75rem;
+    padding: 0.35rem 0.7rem;
+  }
+  
+  .logout-btn .btn-icon {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+@media (max-width: 360px) {
+  .logout-btn {
+    font-size: 0.7rem;
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .logout-btn .btn-icon {
+    width: 14px;
+    height: 14px;
+  }
+}
+
 .view-items-controls {
   margin-bottom: 2rem;
 }
@@ -1316,6 +1386,13 @@ html {
 
 .modal-image-placeholder {
   font-size: 8rem;
+}
+
+.modal-image-placeholder img {
+  max-width: 400px;
+  max-height: 300px;
+  object-fit: contain;
+  border-radius: 8px;
 }
 
 .modal-details-container {
@@ -3866,4 +3943,143 @@ p {
 .button-wrapper:hover .tooltip {
   opacity: 1;
   visibility: visible;
+}
+/* Enhanced UX for date-time picker */
+.picker-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #4a5568;
+}
+
+.today-btn, .confirm-btn {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: none;
+}
+
+.today-btn {
+  background: #4a5568;
+  color: #e2e8f0;
+}
+
+.today-btn:hover {
+  background: #718096;
+}
+
+.confirm-btn {
+  background: #003b6f;
+  color: white;
+  flex: 1;
+}
+
+.confirm-btn:hover {
+  background: #004080;
+}
+
+.time-section {
+  padding-top: 1rem;
+  border-top: 1px solid #4a5568;
+}
+
+.time-header {
+  font-size: 0.85rem;
+  color: #a0aec0;
+  margin-bottom: 0.75rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+.time-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.time-input-group label {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  text-align: center;
+}
+
+.time-separator {
+  color: #a0aec0;
+  font-weight: bold;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.input-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.input-label {
+  font-size: 0.75rem;
+  color: #a0aec0;
+  font-weight: 500;
+}
+
+.input-value {
+  font-size: 0.9rem;
+  color: #e2e8f0;
+}
+/* Improved date selection UI */
+.day {
+  background: none;
+  border: none;
+  color: #e2e8f0;
+  padding: 0.75rem 0.5rem;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  min-height: 40px;
+  position: relative;
+}
+
+.day:hover {
+  background: rgba(74, 85, 104, 0.6);
+  transform: scale(1.05);
+}
+
+.day.other-month {
+  color: #4a5568;
+  opacity: 0.5;
+}
+
+.day.today {
+  background: linear-gradient(135deg, #003b6f 0%, #004080 100%);
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 59, 111, 0.3);
+  font-weight: 600;
+}
+
+.day.today::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: white;
+  border-radius: 50%;
+}
+
+.day.selected {
+  background: linear-gradient(135deg, #004080 0%, #0056b3 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 64, 128, 0.4);
+  font-weight: 600;
+  transform: scale(1.1);
 }

@@ -20,6 +20,8 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
   });
   const [errors, setErrors] = useState({});
   const [showNotification, setShowNotification] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
 
   // Set current date/time when component mounts or selectedItem changes
   useEffect(() => {
@@ -36,8 +38,11 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
     const newErrors = {};
     
     if (!formData.ownerName) newErrors.ownerName = true;
@@ -50,10 +55,15 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
     if (Object.keys(newErrors).length > 0) {
       setShowNotification(true);
       setTimeout(() => setShowNotification(false), 3000);
+      setIsSubmitting(false);
       return;
     }
     
-    onSubmit(formData);
+    try {
+      await onSubmit(formData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!selectedItem) return null;
@@ -151,11 +161,11 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
             </div>
 
             <div className="form-field">
-              <label>Grade Section/Course <span className="tagalog-hint">(Baitang/Course)</span> <span className="required">*</span></label>
+              <label>Grade Section/ Course/ Role <span className="tagalog-hint">(Baitang/Course/Katungkulan)</span> <span className="required">*</span></label>
               <input
                 type="text"
                 name="ownerGrade"
-                placeholder="Enter grade/course"
+                placeholder="Enter grade/course or role"
                 className={`form-input-large ${errors.ownerGrade ? 'error' : ''}`}
                 value={formData.ownerGrade}
                 onChange={(e) => updateFormData('ownerGrade', e.target.value)}
@@ -168,6 +178,7 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
                 type="datetime-local"
                 name="claimDate"
                 className={`form-input-large ${errors.claimDate ? 'error' : ''}`}
+                min="2025-01-01T00:00"
                 value={formData.claimDate}
                 onChange={(e) => updateFormData('claimDate', e.target.value)}
               />
@@ -175,8 +186,10 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
           </div>
 
           <div className="form-footer">
-            <button type="button" className="cancel-btn" onClick={onBack}>Cancel</button>
-            <button type="submit" className={`submit-btn ${formData.ownerName && formData.ownerId && formData.ownerGrade && formData.claimDate ? 'active' : ''}`}>Submit</button>
+            <button type="button" className="cancel-btn" onClick={() => setShowCancelModal(true)}>Cancel</button>
+            <button type="submit" disabled={isSubmitting} className={`submit-btn ${formData.ownerName && formData.ownerId && formData.ownerGrade && formData.claimDate && !isSubmitting ? 'active' : ''}`}>
+              {isSubmitting ? 'Submitting...' : 'Submit'}
+            </button>
           </div>
         </form>
       </div>
@@ -186,6 +199,25 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
           <div className="notification-content">
             <span className="notification-icon">⚠️</span>
             <span className="notification-text">Please fill in all fields</span>
+          </div>
+        </div>
+      )}
+      
+      {showCancelModal && (
+        <div className="pin-modal-overlay">
+          <div className="pin-modal">
+            <p className="pin-modal-text">
+              Are you sure you want to cancel?<br />
+              All entered data will be lost.
+            </p>
+            <div className="pin-modal-buttons">
+              <button className="pin-cancel-btn" onClick={() => setShowCancelModal(false)}>
+                Stay
+              </button>
+              <button className="pin-confirm-btn" onClick={onBack}>
+                Cancel Form
+              </button>
+            </div>
           </div>
         </div>
       )}

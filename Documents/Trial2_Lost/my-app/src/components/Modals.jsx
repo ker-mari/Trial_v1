@@ -15,6 +15,8 @@ const categoryEmojis = {
 };
 
 export const ItemDetailsModal = ({ selectedItem, onClose, onClaim, onEdit }) => {
+  const [isClicking, setIsClicking] = useState(false);
+  
   if (!selectedItem) return null;
 
   return (
@@ -28,10 +30,10 @@ export const ItemDetailsModal = ({ selectedItem, onClose, onClaim, onEdit }) => 
           <div className="modal-image-container">
             <div className="modal-image-placeholder">
               {selectedItem.image && (selectedItem.image.startsWith('http') || selectedItem.image.startsWith('data:image/')) ? (
-                <img src={selectedItem.image} alt="Item" style={{maxWidth: '200px', maxHeight: '200px', objectFit: 'contain', borderRadius: '8px'}} />
+                <img src={selectedItem.image} alt="Item" style={{maxWidth: '300px', maxHeight: '300px', objectFit: 'contain', borderRadius: '8px'}} />
               ) : (
                 categoryEmojis[selectedItem.category]?.startsWith('http') ? (
-                  <img src={categoryEmojis[selectedItem.category]} alt={selectedItem.category} style={{maxWidth: '200px', maxHeight: '200px', objectFit: 'contain'}} />
+                  <img src={categoryEmojis[selectedItem.category]} alt={selectedItem.category} style={{maxWidth: '400px', maxHeight: '300px', objectFit: 'contain'}} />
                 ) : (
                   categoryEmojis[selectedItem.category] || '📦'
                 )
@@ -39,7 +41,7 @@ export const ItemDetailsModal = ({ selectedItem, onClose, onClaim, onEdit }) => 
             </div>
           </div>
           <div className="modal-details-container">
-            <h3>Item no.: {selectedItem.itemNo || String(selectedItem.id).padStart(5, '0')}</h3>
+            <h3>Item no. {selectedItem.itemNo || String(selectedItem.id).padStart(5, '0')}</h3>
             <p className="modal-category">{selectedItem.category}</p>
             <p className="modal-info-label">Location Found</p>
             <p className="modal-info-value">{selectedItem.location}</p>
@@ -62,8 +64,30 @@ export const ItemDetailsModal = ({ selectedItem, onClose, onClaim, onEdit }) => 
           </div>
         </div>
         <div className="modal-footer">
-          <button className="modal-action-btn claim-btn" onClick={onClaim}>Claim</button>
-          <button className="modal-action-btn edit-btn" onClick={onEdit}>Edit</button>
+          <button 
+            className="modal-action-btn claim-btn" 
+            disabled={isClicking}
+            onClick={() => {
+              if (isClicking) return;
+              setIsClicking(true);
+              onClaim();
+              setTimeout(() => setIsClicking(false), 1000);
+            }}
+          >
+            {isClicking ? 'Loading...' : 'Claim'}
+          </button>
+          <button 
+            className="modal-action-btn edit-btn" 
+            disabled={isClicking}
+            onClick={() => {
+              if (isClicking) return;
+              setIsClicking(true);
+              onEdit();
+              setTimeout(() => setIsClicking(false), 1000);
+            }}
+          >
+            {isClicking ? 'Loading...' : 'Edit'}
+          </button>
         </div>
       </div>
     </div>
@@ -239,6 +263,7 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
   const [editFormData, setEditFormData] = useState(originalData);
   const [showNotification, setShowNotification] = useState(false);
   const [notificationMessage, setNotificationMessage] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const hasChanges = JSON.stringify(editFormData) !== JSON.stringify(originalData);
 
@@ -246,7 +271,9 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
     setEditFormData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (isSubmitting) return;
+    
     // Validate required fields
     if (!editFormData.category || !editFormData.location ||
         !editFormData.date || !editFormData.description) {
@@ -264,7 +291,12 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
       return;
     }
 
-    onSubmit(editFormData);
+    setIsSubmitting(true);
+    try {
+      await onSubmit(editFormData);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   if (!selectedItem) return null;
@@ -363,11 +395,11 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
           <button className="edit-cancel-btn" onClick={onClose}>Cancel</button>
           <div className="button-wrapper">
             <button 
-              className={`edit-save-btn ${!hasChanges ? 'disabled' : ''}`} 
+              className={`edit-save-btn ${!hasChanges || isSubmitting ? 'disabled' : ''}`} 
               onClick={handleSubmit}
-              disabled={!hasChanges}
+              disabled={!hasChanges || isSubmitting}
             >
-              Save Changes
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
             {!hasChanges && (
               <div className="tooltip">No changes made</div>

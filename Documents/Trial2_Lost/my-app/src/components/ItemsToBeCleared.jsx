@@ -15,8 +15,17 @@ const ItemsToBeCleared = () => {
   useEffect(() => {
     fetchItemsToBeCleared();
     document.body.style.overflow = 'hidden';
+    
+    // Listen for refresh events
+    const handleRefresh = () => {
+      fetchItemsToBeCleared();
+    };
+    
+    window.addEventListener('refreshItemsToBeCleared', handleRefresh);
+    
     return () => {
       document.body.style.overflow = 'auto';
+      window.removeEventListener('refreshItemsToBeCleared', handleRefresh);
     };
   }, []);
 

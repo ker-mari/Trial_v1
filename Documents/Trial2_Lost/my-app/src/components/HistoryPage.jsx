@@ -19,20 +19,13 @@ const HistoryPage = ({ historyItems }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [dateSort, setDateSort] = useState(null); // 'asc' or 'desc'
   const [codeFilter, setCodeFilter] = useState('all'); // 'all', 'V', 'L'
+  const [clickingItem, setClickingItem] = useState(null);
   
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     
-    // Poll for updates every 5 seconds
-    const interval = setInterval(() => {
-      if (window.location.pathname === '/history') {
-        window.location.reload();
-      }
-    }, 5000);
-    
     return () => {
       document.body.style.overflow = 'auto';
-      clearInterval(interval);
     };
   }, []);
   
@@ -44,8 +37,8 @@ const HistoryPage = ({ historyItems }) => {
     setDateSort(dateSort === null ? 'asc' : dateSort === 'asc' ? 'desc' : null);
   };
   
-  // Filter out 'Handed Over' items only
-  let filteredItems = historyItems?.filter(item => item.status !== 'Handed Over') || [];
+  // Backend already filters out unwanted statuses
+  let filteredItems = historyItems || [];
   
   // Apply code filter
   if (codeFilter !== 'all') {
@@ -144,20 +137,26 @@ const HistoryPage = ({ historyItems }) => {
                     <td>{item.owner || 'N/A'}</td>
                     <td style={{textAlign: 'center'}}>
                       <span className={`status-text ${
-                        item.status === 'Claimed' || item.status === 'Approved' || item.status === 'Edit Approved' ? 'status-claimed' :
-                        item.status === 'Rejected' || item.status === 'Edit Rejected' ? 'status-rejected' :
+                        item.status === 'Claimed' || item.status === 'Edit Approved' ? 'status-claimed' :
+                        item.status === 'Edit Rejected' ? 'status-rejected' :
                         item.status === 'Admin Edit' ? 'status-admin-edit' : ''
                       }`}>
-                        {item.status === 'Admin Edit' ? 'Admin Update' : item.status || 'N/A'}
+                        {item.status === 'Admin Edit' ? 'Admin Update' : item.status || 'selectedItem.owner '}
                       </span>
                     </td>
                     <td>{item.officer || 'N/A'}</td>
                     <td>
                       <button 
                         className="view-details-btn"
-                        onClick={() => setSelectedItem(item)}
+                        disabled={clickingItem === item.id}
+                        onClick={() => {
+                          if (clickingItem) return;
+                          setClickingItem(item.id);
+                          setSelectedItem(item);
+                          setTimeout(() => setClickingItem(null), 500);
+                        }}
                       >
-                        View Details
+                        {clickingItem === item.id ? 'Loading...' : 'View Details'}
                       </button>
                     </td>
                   </tr>
@@ -258,8 +257,8 @@ const HistoryPage = ({ historyItems }) => {
                     <div className="history-info-item">
                       <strong>Status:</strong> 
                       <span className={`history-status-badge ${
-                        selectedItem.status === 'Claimed' || selectedItem.status === 'Approved' || selectedItem.status === 'Edit Approved' ? 'claimed' :
-                        selectedItem.status === 'Rejected' || selectedItem.status === 'Edit Rejected' ? 'rejected' :
+                        selectedItem.status === 'Claimed' || selectedItem.status === 'Edit Approved' ? 'claimed' :
+                        selectedItem.status === 'Edit Rejected' ? 'rejected' :
                         selectedItem.status === 'Admin Edit' ? 'admin-edit' : 'default'
                       }`}>
                         {selectedItem.status === 'Admin Edit' ? 'Admin Update' : selectedItem.status || 'N/A'}

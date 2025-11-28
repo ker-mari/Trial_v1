@@ -85,6 +85,36 @@ function App() {
     }
   }, [screen]);
 
+  // Smart real-time updates with rate limiting handling
+  useEffect(() => {
+    if (!sessionStorage.getItem('authenticated')) return;
+    
+    let retryDelay = 15000; // Start with 15 seconds
+    
+    const updateWithRetry = async () => {
+      try {
+        if (screen === 'dashboard' || screen === 'viewItems') {
+          await loadItemsFromDatabase();
+        } else if (screen === 'history') {
+          await loadHistoryFromDatabase();
+        } else if (screen === 'approvalQueues') {
+          window.dispatchEvent(new CustomEvent('refreshApprovalQueues'));
+        } else if (screen === 'itemsToBeCleared') {
+          window.dispatchEvent(new CustomEvent('refreshItemsToBeCleared'));
+        }
+        retryDelay = 15000; // Reset delay on success
+      } catch (error) {
+        if (error.response?.status === 429) {
+          retryDelay = Math.min(retryDelay * 2, 60000); // Exponential backoff, max 60s
+        }
+      }
+    };
+    
+    const interval = setInterval(updateWithRetry, retryDelay);
+    
+    return () => clearInterval(interval);
+  }, [screen]);
+
 
 
 
@@ -118,7 +148,8 @@ function App() {
         const dbHistory = data.data || [];
 
         // Load localStorage history (contains approval/rejection comments)
-        const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]');
+        const localHistory = JSON.parse(localStorage.getItem('localHistory') || '[]')
+          .filter(item => !['Approved', 'Rejected'].includes(item.status));
 
         // Merge both histories, with localStorage taking precedence for newer items
         const mergedHistory = [...localHistory, ...dbHistory];
@@ -223,20 +254,21 @@ function App() {
   const handleClaimSubmit = async (claimFormData) => {
     try {
       const { itemsAPI } = await import('./services/api.js');
-      const response = await itemsAPI.claim(selectedItem.id, {
+      const claimData = {
         owner: claimFormData.ownerName,
         claimer_name: claimFormData.ownerName,
         claimer_grade: claimFormData.ownerGrade,
         claimer_id: claimFormData.ownerId,
         claim_date: claimFormData.claimDate
-      });
+      };
+      
+      console.log('Claiming item with data:', claimData);
+      console.log('Selected item ID:', selectedItem.id);
+      
+      const response = await itemsAPI.claim(selectedItem.id, claimData);
       
       if (response.data.success) {
-        // Update local state to remove claimed item
         setItems(prev => prev.filter(item => item.id !== selectedItem.id));
-        
-
-        
         setSelectedItem(null);
         setIsSuccessModalOpen(true);
         navigateToScreen('viewItems');
@@ -244,10 +276,10 @@ function App() {
         throw new Error(response.data.message || 'Failed to claim item');
       }
     } catch (error) {
-      if (import.meta.env.DEV) {
-        console.error('Error claiming item:', error);
-      }
-      alert('Error claiming item: ' + error.message);
+      console.error('Error claiming item:', error);
+      console.error('Error response:', error.response?.data);
+      console.error('Error status:', error.response?.status);
+      alert('Error claiming item: ' + (error.response?.data?.message || error.message));
     }
   };
 
@@ -362,10 +394,38 @@ function App() {
   const handleCloseSuccessModal = () => { setIsSuccessModalOpen(false); setSelectedItem(null); };
   const handleCloseHandOverSuccessModal = () => { setIsHandOverSuccessModalOpen(false); navigateToScreen('dashboard'); };
 
+  const handleLogout = async () => {
+    try {
+      const { authAPI } = await import('./services/api.js');
+      await authAPI.logout();
+    } catch (error) {
+      if (import.meta.env.DEV) {
+        console.error('Logout error:', error);
+      }
+    } finally {
+      // Clear all session data
+      sessionStorage.clear();
+      setUserName('');
+      setIsAdmin(false);
+      setItems([]);
+      setHistoryItems([]);
+      setSelectedItem(null);
+      
+      // Clear API headers
+      const { setAuthToken, setAdminHeader } = await import('./services/api.js');
+      setAuthToken(null);
+      setAdminHeader(false);
+      
+      // Navigate to start screen
+      window.history.pushState({}, '', '/');
+      setScreen('start');
+    }
+  };
+
   return (
     <ErrorBoundary>
       <div className="app">
-        <MainHeader screen={screen} onDashboard={() => navigateToScreen('dashboard')} />
+        <MainHeader screen={screen} onDashboard={() => navigateToScreen('dashboard')} onLogout={handleLogout} />
 
         <div className={`screen-container ${isTransitioning ? 'transitioning' : ''}`}>
           {screen === "start" && <StartScreen onGetStarted={() => navigateToScreen('pin')} />}

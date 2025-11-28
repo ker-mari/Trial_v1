@@ -26,8 +26,17 @@ const ApprovalQueues = () => {
   useEffect(() => {
     fetchPendingEdits();
     document.body.style.overflow = 'hidden';
+    
+    // Listen for refresh events
+    const handleRefresh = () => {
+      fetchPendingEdits();
+    };
+    
+    window.addEventListener('refreshApprovalQueues', handleRefresh);
+    
     return () => {
       document.body.style.overflow = 'auto';
+      window.removeEventListener('refreshApprovalQueues', handleRefresh);
     };
   }, []);
 

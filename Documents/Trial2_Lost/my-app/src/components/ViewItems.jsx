@@ -19,13 +19,14 @@ const valuableCategories = ['Gadgets / Electronics', 'Money and Payment Items', 
 const ViewItems = ({ items, onViewDetails }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [codeFilter, setCodeFilter] = useState('All'); // 'All', 'L', 'V'
+  const [clickingItem, setClickingItem] = useState(null);
 
   // Helper function to check if item is valuable
   const isValuable = (item) => {
     return item.is_valuable || valuableCategories.includes(item.category);
   };
 
-  // Filter items based on search query and code filter, sort newest to oldest
+  // Filter items based on search query and code filter (backend already sorts newest first)
   const filteredItems = useMemo(() => {
     return items.filter(item => {
       // Code filter (L = Lost/Regular, V = Valuable)
@@ -42,10 +43,6 @@ const ViewItems = ({ items, onViewDetails }) => {
         item.location?.toLowerCase().includes(query) ||
         String(item.item_no || item.itemNo || item.id).toLowerCase().includes(query)
       );
-    }).sort((a, b) => {
-      const dateA = new Date(a.created_at || a.date_time || a.date);
-      const dateB = new Date(b.created_at || b.date_time || b.date);
-      return dateB - dateA; // Newest first
     });
   }, [items, searchQuery, codeFilter]);
 
@@ -101,7 +98,7 @@ const ViewItems = ({ items, onViewDetails }) => {
           filteredItems.map((item) => (
             <div className="item-card" key={item.id}>
               <div className="item-card-header">
-                <h3>item no. {item.itemNo || String(item.id).padStart(5, '0')}</h3>
+                <h3>item no. {item.itemNo || item.id}</h3>
                 {isValuable(item) && <span className="valuable-tag">Valuable</span>}
               </div>
               <p className="item-category">{item.category}</p>
@@ -116,8 +113,17 @@ const ViewItems = ({ items, onViewDetails }) => {
                   )
                 )}
               </div>
-              <button className="view-details-btn" onClick={() => onViewDetails(item)}>
-                View Details
+              <button 
+                className="view-details-btn" 
+                disabled={clickingItem === item.id}
+                onClick={() => {
+                  if (clickingItem) return;
+                  setClickingItem(item.id);
+                  onViewDetails(item);
+                  setTimeout(() => setClickingItem(null), 500);
+                }}
+              >
+                {clickingItem === item.id ? 'Loading...' : 'View Details'}
               </button>
             </div>
           ))

@@ -1,6 +1,6 @@
 import React from 'react';
 
-export const MainHeader = ({ screen, onDashboard }) => {
+export const MainHeader = ({ screen, onDashboard, onLogout }) => {
   return (
     <header className="header">
       <div className="logo-section">
@@ -17,6 +17,14 @@ export const MainHeader = ({ screen, onDashboard }) => {
             {screen === 'itemsToBeCleared' && 'ITEMS TO BE CLEARED'}
             {screen === 'claimForm' && 'CLAIM FORM'}
           </h2>
+        </div>
+      )}
+      {screen === "dashboard" && (
+        <div className="logout-section">
+          <button className="logout-btn" onClick={onLogout}>
+            <img src="https://cdn-icons-png.flaticon.com/512/1828/1828490.png" alt="Logout" className="btn-icon" />
+            LOG OUT
+          </button>
         </div>
       )}
       {screen !== "start" && screen !== "pin" && screen !== "dashboard" && (
