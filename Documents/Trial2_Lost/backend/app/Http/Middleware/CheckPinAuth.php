@@ -26,8 +26,21 @@ class CheckPinAuth
             ], 401);
         }
 
-        // Verify token exists in cache (session store)
+        // Verify token exists in cache (session store) with fallback to database
         $sessionData = Cache::get('auth_token:' . $authToken);
+        
+        // Fallback: check database if cache fails (for production stability)
+        if (!$sessionData && strlen($authToken) === 32) {
+            $sessionData = \Illuminate\Support\Facades\DB::table('cache')
+                ->where('key', 'auth_token:' . $authToken)
+                ->where('expiration', '>', time())
+                ->value('value');
+            if ($sessionData) {
+                $sessionData = unserialize($sessionData);
+                // Restore to cache
+                Cache::put('auth_token:' . $authToken, $sessionData, 1800);
+            }
+        }
 
         if (!$sessionData) {
             return response()->json([

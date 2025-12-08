@@ -21,7 +21,7 @@ return new class extends Migration
             $table->dateTime('date_time');
             $table->text('description');
             $table->enum('status', ['available', 'claimed'])->default('available');
-            $table->timestamps();
+            $table->timestamps(); 
         });
     }
 

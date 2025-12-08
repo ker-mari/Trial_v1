@@ -77,7 +77,7 @@ const ClaimForm = ({ userName, selectedItem, onSubmit, onBack }) => {
               <label>Item's Information <span className="tagalog-hint">(Detalye ng item)</span></label>
             </div>
             <div className="on-duty-label">
-              <label>ON DUTY: "{userName}"</label>
+              <label>ON DUTY: {userName}</label>
             </div>
           </div>
           

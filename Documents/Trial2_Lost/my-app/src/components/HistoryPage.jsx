@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { itemsAPI } from '../services/api';
 import './HistoryPage.css';
 
 const categoryEmojis = {
@@ -20,6 +21,7 @@ const HistoryPage = ({ historyItems }) => {
   const [dateSort, setDateSort] = useState(null); // 'asc' or 'desc'
   const [codeFilter, setCodeFilter] = useState('all'); // 'all', 'V', 'L'
   const [clickingItem, setClickingItem] = useState(null);
+  const [rejectionComments, setRejectionComments] = useState([]);
   
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -138,10 +140,10 @@ const HistoryPage = ({ historyItems }) => {
                     <td style={{textAlign: 'center'}}>
                       <span className={`status-text ${
                         item.status === 'Claimed' || item.status === 'Edit Approved' ? 'status-claimed' :
-                        item.status === 'Edit Rejected' ? 'status-rejected' :
-                        item.status === 'Admin Edit' ? 'status-admin-edit' : ''
+                        item.status === 'Rejected' || item.status === 'Edit Rejected' ? 'status-rejected' :
+                        item.status === 'Admin Edit'  ? 'status-admin-edit' : ''
                       }`}>
-                        {item.status === 'Admin Edit' ? 'Admin Update' : item.status || 'selectedItem.owner '}
+                        {item.status === 'Admin Edit' ? 'Admin Update' : item.status || 'N/A'}
                       </span>
                     </td>
                     <td>{item.officer || 'N/A'}</td>
@@ -149,10 +151,26 @@ const HistoryPage = ({ historyItems }) => {
                       <button 
                         className="view-details-btn"
                         disabled={clickingItem === item.id}
-                        onClick={() => {
+                        onClick={async () => {
                           if (clickingItem) return;
                           setClickingItem(item.id);
                           setSelectedItem(item);
+                          
+                          // Fetch rejection comments for any item
+                          const itemId = item.item_id || item.id;
+                          if (itemId) {
+                            try {
+                              const response = await itemsAPI.getRejectionComments(itemId);
+                              console.log('Rejection comments response:', response.data);
+                              setRejectionComments(response.data || []);
+                            } catch (error) {
+                              console.error('Failed to fetch rejection comments:', error);
+                              setRejectionComments([]);
+                            }
+                          } else {
+                            setRejectionComments([]);
+                          }
+                          
                           setTimeout(() => setClickingItem(null), 500);
                         }}
                       >
@@ -209,22 +227,31 @@ const HistoryPage = ({ historyItems }) => {
                 <hr className="history-modal-divider" />
                 <p className="history-modal-info-label">Description</p>
                 <p className="history-modal-info-value">{selectedItem.description || 'N/A'}</p>
-                {selectedItem.comment && (
-                  <>
-                    <p className="history-modal-info-label" style={{marginTop: '1rem', color: '#e74c3c'}}>
-                      Admin Comment
-                    </p>
-                    <p className="history-modal-info-value" style={{
+                {/* Always show rejection comments section for debugging */}
+                <p className="history-modal-info-label" style={{marginTop: '1rem', color: '#e74c3c'}}>
+                  Admin Comments ({rejectionComments.length} found)
+                </p>
+                {rejectionComments.length > 0 ? (
+                  rejectionComments.map((comment, index) => (
+                    <div key={index} style={{
                       padding: '0.75rem',
                       background: '#fff5f5',
                       border: '1px solid #ffcccc',
                       borderRadius: '6px',
                       color: '#c0392b',
-                      fontStyle: 'italic'
+                      fontStyle: 'italic',
+                      marginBottom: '0.5rem'
                     }}>
-                      {selectedItem.comment}
-                    </p>
-                  </>
+                      <p style={{margin: 0, marginBottom: '0.25rem'}}>
+                        <strong>Reason:</strong> {comment.rejection_reason || 'No reason provided'}
+                      </p>
+                      <p style={{margin: 0, fontSize: '0.85em', opacity: 0.8}}>
+                        By: {comment.user_name} • {new Date(comment.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <p style={{color: '#666', fontStyle: 'italic'}}>No admin comments available</p>
                 )}
                 <hr className="history-modal-divider" />
                 <div className="history-two-column-info">
@@ -258,7 +285,7 @@ const HistoryPage = ({ historyItems }) => {
                       <strong>Status:</strong> 
                       <span className={`history-status-badge ${
                         selectedItem.status === 'Claimed' || selectedItem.status === 'Edit Approved' ? 'claimed' :
-                        selectedItem.status === 'Edit Rejected' ? 'rejected' :
+                        selectedItem.status === 'Rejected' || selectedItem.status === 'Edit Rejected' ? 'rejected' :
                         selectedItem.status === 'Admin Edit' ? 'admin-edit' : 'default'
                       }`}>
                         {selectedItem.status === 'Admin Edit' ? 'Admin Update' : selectedItem.status || 'N/A'}

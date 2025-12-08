@@ -156,7 +156,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
               <input 
                 type="text" 
                 name="finderGrade" 
-                placeholder="Enter your grade/course" 
+                placeholder="Enter your grade/ course/ role" 
                 className={`form-input ${errors.finderGrade ? 'error' : ''}`}
                 value={formData.finderGrade}
                 onChange={(e) => updateFormData('finderGrade', e.target.value)}
@@ -244,7 +244,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
                 </div>
                 {dropdowns.location && (
                   <div className="dropdown-menu scrollable">
-                    {['Entrance Lobby', 'Lobby 2 (Lost and Found Location)', 'EFS 1st Floor', 'EFS 2nd Floor', 'EFS 3rd Floor', 'EFS 4th Floor', 'DSR 1st Floor', 'DSR 2nd Floor', 'DSR 3rd Floor', 'DSR 4th Floor', 'Others:'].map(location => (
+                    {['Auditorium','Entrance Lobby', 'Lobby 2 (Lost and Found Location)', 'Canteen','EFS 1st Floor', 'EFS 2nd Floor', 'EFS 3rd Floor', 'EFS 4th Floor', 'DSR 1st Floor', 'DSR 2nd Floor', 'DSR 3rd Floor', 'DSR 4th Floor', 'Others:'].map(location => (
                       <div key={location} className="dropdown-item" onClick={() => {
                         updateFormData('location', location);
                         if (location !== 'Others:') {

@@ -9,6 +9,7 @@ use App\Models\Item;
 use App\Models\History;
 use App\Rules\ValidBase64Image;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class ItemController extends Controller
 {
@@ -31,7 +32,7 @@ class ItemController extends Controller
             'description' => 'required|string|max:1000',
             'date_time' => 'required|date',
             'is_valuable' => 'boolean',
-            'image' => ['nullable', new ValidBase64Image(5)], // Max 5MB
+            'image' => ['nullable', new ValidBase64Image(2)], // Max 2MB for memory optimization
             'finder_name' => 'nullable|string|max:100',
             'finder_grade' => 'nullable|string|max:100',
             'finder_id' => 'nullable|string|max:50',
@@ -46,29 +47,44 @@ class ItemController extends Controller
             $validated['officer'] = $request->input('auth_user_name', 'System');
         }
 
-        // Retry logic to handle race conditions in item_no generation
-        $maxAttempts = 5;
+        // Compress image if present to save memory
+        if (!empty($validated['image'])) {
+            $validated['image'] = $this->compressBase64Image($validated['image']);
+        }
+
+        // Improved retry logic with exponential backoff
+        $maxAttempts = 10;
         $attempt = 0;
         $item = null;
 
         while ($attempt < $maxAttempts) {
             try {
                 $item = DB::transaction(function () use ($validated) {
-                    return Item::create($validated);
-                });
-                break; // Success, exit loop
-            } catch (\Illuminate\Database\QueryException $e) {
-                // Check if it's a unique constraint violation on item_no
-                if (str_contains($e->getMessage(), 'UNIQUE constraint failed: items.item_no')) {
-                    $attempt++;
-                    if ($attempt >= $maxAttempts) {
-                        throw $e; // Give up after max attempts
+                    // Use UUID-based item_no to prevent race conditions
+                    if (empty($validated['item_no'])) {
+                        $validated['item_no'] = time() . rand(100, 999);
                     }
-                    // Small delay before retry
-                    usleep(50000); // 50ms
+                    return Item::create($validated);
+                }, 3); // 3 second timeout
+                break;
+            } catch (\Illuminate\Database\QueryException $e) {
+                $attempt++;
+                if (str_contains($e->getMessage(), 'UNIQUE constraint failed') || 
+                    str_contains($e->getMessage(), 'Duplicate entry')) {
+                    if ($attempt >= $maxAttempts) {
+                        Log::error('Max retry attempts reached for item creation', ['attempt' => $attempt]);
+                        return response()->json([
+                            'success' => false,
+                            'message' => 'System busy, please try again in a moment'
+                        ], 503);
+                    }
+                    // Exponential backoff: 100ms, 200ms, 400ms, etc.
+                    usleep(100000 * pow(2, min($attempt - 1, 4)));
                     continue;
                 }
-                // If it's a different error, throw it immediately
+                throw $e;
+            } catch (\Exception $e) {
+                Log::error('Item creation failed', ['error' => $e->getMessage()]);
                 throw $e;
             }
         }
@@ -78,6 +94,50 @@ class ItemController extends Controller
             'data' => $item,
             'message' => 'Item created successfully'
         ], 201);
+    }
+
+    private function compressBase64Image($base64Image, $quality = 70)
+    {
+        try {
+            // Extract image data
+            if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
+                $imageData = substr($base64Image, strpos($base64Image, ',') + 1);
+                $imageData = base64_decode($imageData);
+                
+                // Create image resource
+                $image = imagecreatefromstring($imageData);
+                if (!$image) return $base64Image;
+                
+                // Get dimensions and compress if too large
+                $width = imagesx($image);
+                $height = imagesy($image);
+                
+                // Resize if larger than 800px
+                if ($width > 800 || $height > 800) {
+                    $ratio = min(800 / $width, 800 / $height);
+                    $newWidth = (int)($width * $ratio);
+                    $newHeight = (int)($height * $ratio);
+                    
+                    $resized = imagecreatetruecolor($newWidth, $newHeight);
+                    imagecopyresampled($resized, $image, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+                    imagedestroy($image);
+                    $image = $resized;
+                }
+                
+                // Compress and convert back to base64
+                ob_start();
+                imagejpeg($image, null, $quality);
+                $compressedData = ob_get_contents();
+                ob_end_clean();
+                imagedestroy($image);
+                
+                return 'data:image/jpeg;base64,' . base64_encode($compressedData);
+            }
+        } catch (\Exception $e) {
+            Log::warning('Image compression failed', ['error' => $e->getMessage()]);
+        }
+        
+        return $base64Image;
     }
 
     public function show(Item $item): JsonResponse

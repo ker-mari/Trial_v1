@@ -56,11 +56,9 @@ class Item extends Model
         parent::boot();
 
         static::creating(function ($item) {
-            // Auto-generate item_no as auto-incrementing integer
+            // item_no now handled in controller for better transaction control
             if (empty($item->item_no)) {
-                // Get max and increment - retry logic in controller handles race conditions
-                $maxItemNo = static::max('item_no') ?? 0;
-                $item->item_no = (int)$maxItemNo + 1;
+                $item->item_no = 1; // Fallback, should be set in controller
             }
         });
 
