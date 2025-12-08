@@ -26,6 +26,7 @@ return new class extends Migration
             $table->string('claimer_id', 50)->nullable();
             $table->datetime('claim_date')->nullable();
             $table->string('officer', 100)->nullable();
+            $table->datetime('date_handed_over')->nullable();
             $table->timestamps();
         });
     }

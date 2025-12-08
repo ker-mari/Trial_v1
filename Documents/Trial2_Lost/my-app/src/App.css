@@ -2753,6 +2753,12 @@ input[type="time"].form-input-large.error {
   font-size: 1.1em;
 }
 
+.date.edited-text {
+  color: #32CD32;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
 .date {
   color: #666;
   margin-top: 5px;

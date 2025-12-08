@@ -177,6 +177,7 @@ const ApprovalQueues = () => {
                 >
                   Code {codeFilter === 'all' ? '(All)' : codeFilter === 'V' ? '(V)' : '(L)'}
                 </th>
+                <th>Item No.</th>
                 <th>Item Name</th>
                 <th>Status</th>
                 <th>Officer</th>
@@ -185,7 +186,7 @@ const ApprovalQueues = () => {
             </thead>
             <tbody>
               {loading ? (
-                <tr><td colSpan="7" style={{textAlign: 'center', padding: '3rem', fontSize: '1.1rem'}}>Loading...</td></tr>
+                <tr><td colSpan="8" style={{textAlign: 'center', padding: '3rem', fontSize: '1.1rem'}}>Loading...</td></tr>
               ) : (() => {
                 // Apply filters and sorting
                 let filteredEdits = [...pendingEdits];
@@ -208,7 +209,7 @@ const ApprovalQueues = () => {
                 }
                 
                 return filteredEdits.length === 0 ? (
-                  <tr><td colSpan="7" style={{textAlign: 'center', padding: '3rem', color: '#666', fontSize: '1.2rem', fontWeight: 'bold'}}>No pending approvals at the moment.</td></tr>
+                  <tr><td colSpan="8" style={{textAlign: 'center', padding: '3rem', color: '#666', fontSize: '1.2rem', fontWeight: 'bold'}}>No pending approvals at the moment.</td></tr>
                 ) : filteredEdits.map((edit, index) => (
                 <tr key={edit.id} className={index % 2 === 1 ? "gray-row" : ""}>
                   <td>{new Date(edit.created_at).toLocaleDateString('en-US', { 
@@ -225,6 +226,7 @@ const ApprovalQueues = () => {
                       {edit.new_data?.is_valuable || edit.original_data?.is_valuable ? 'V' : 'L'}
                     </span>
                   </td>
+                  <td>{edit.item_no || edit.item_id || 'N/A'}</td>
                   <td>{edit.new_data?.category || edit.original_data?.category}</td>
                   <td>
                     <span className="status-badge pending">Pending</span>
@@ -260,7 +262,7 @@ const ApprovalQueues = () => {
                 <h4>OLD</h4>
                 <div className="item-details">
                   <div className="detail-item">
-                    <strong>Item no.:</strong> {selectedEdit.original_data?.item_no || 'N/A'}
+                    <strong>Item Category:</strong>
                   </div>
                   <div className="detail-item category">
                     {selectedEdit.original_data?.category || 'N/A'}
@@ -290,7 +292,7 @@ const ApprovalQueues = () => {
                 <h4>EDITED</h4>
                 <div className="item-details">
                   <div className="detail-item">
-                    <strong>Item no.:</strong> {selectedEdit.new_data?.item_no || selectedEdit.original_data?.item_no || 'N/A'}
+                    <strong>Item Category:</strong>
                   </div>
                   <div className={`detail-item category ${selectedEdit.new_data?.category !== selectedEdit.original_data?.category ? 'edited-text' : ''}`}>
                     {selectedEdit.new_data?.category || selectedEdit.original_data?.category || 'N/A'}

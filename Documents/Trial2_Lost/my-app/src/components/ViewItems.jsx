@@ -41,7 +41,7 @@ const ViewItems = ({ items, onViewDetails }) => {
         item.category?.toLowerCase().includes(query) ||
         item.description?.toLowerCase().includes(query) ||
         item.location?.toLowerCase().includes(query) ||
-        String(item.item_no || item.itemNo || item.id).toLowerCase().includes(query)
+        String(item.item_no || item.id).toLowerCase().includes(query)
       );
     });
   }, [items, searchQuery, codeFilter]);
@@ -98,7 +98,7 @@ const ViewItems = ({ items, onViewDetails }) => {
           filteredItems.map((item) => (
             <div className="item-card" key={item.id}>
               <div className="item-card-header">
-                <h3>item no. {item.itemNo || item.id}</h3>
+                <h3>item no. {item.item_no || item.id}</h3>
                 {isValuable(item) && <span className="valuable-tag">Valuable</span>}
               </div>
               <p className="item-category">{item.category}</p>

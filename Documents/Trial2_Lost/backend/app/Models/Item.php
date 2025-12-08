@@ -24,13 +24,15 @@ class Item extends Model
         'claimer_grade',
         'claimer_id',
         'claim_date',
-        'officer'
+        'officer',
+        'date_handed_over'
     ];
 
     protected $casts = [
         'is_valuable' => 'boolean',
         'date_time' => 'datetime',
         'claim_date' => 'datetime',
+        'date_handed_over' => 'datetime',
         'item_no' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime'
@@ -48,7 +50,7 @@ class Item extends Model
 
     public function scopeOlderThan(Builder $query, int $days): Builder
     {
-        return $query->whereDate('date_time', '<=', now()->subDays($days));
+        return $query->whereDate('date_handed_over', '<=', now()->subDays($days));
     }
 
     protected static function boot()

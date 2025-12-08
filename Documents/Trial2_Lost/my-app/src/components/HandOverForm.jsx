@@ -131,7 +131,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
 
   const confirmCancel = () => {
     setShowCancelModal(false);
-    window.history.back();
+    onNavigate('dashboard');
   };
 
   return (
@@ -341,7 +341,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
         <div className="pin-modal-overlay">
           <div className="pin-modal">
             <p className="pin-modal-text">
-              Are you sure you want to cancel?<br />
+              Are you sure you want to leave?<br />
               All entered data will be lost.
             </p>
             <div className="pin-modal-buttons">
@@ -349,7 +349,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
                 Stay
               </button>
               <button className="pin-confirm-btn" onClick={confirmCancel}>
-                Cancel Form
+                Leave Page
               </button>
             </div>
           </div>

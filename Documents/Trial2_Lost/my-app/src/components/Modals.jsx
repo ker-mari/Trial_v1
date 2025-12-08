@@ -283,17 +283,13 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
       return;
     }
 
-    // Validate description length
-    if (editFormData.description.trim().length < 5) {
-      setNotificationMessage('Description must be at least 5 characters');
-      setShowNotification(true);
-      setTimeout(() => setShowNotification(false), 3000);
-      return;
-    }
-
     setIsSubmitting(true);
     try {
       await onSubmit(editFormData);
+    } catch (error) {
+      setNotificationMessage('Failed to save changes. Please try again.');
+      setShowNotification(true);
+      setTimeout(() => setShowNotification(false), 3000);
     } finally {
       setIsSubmitting(false);
     }
@@ -382,9 +378,18 @@ export const EditFormModal = ({ selectedItem, userName, onClose, onSubmit }) => 
                 placeholder="Please provide a description of the item" 
                 className="edit-textarea" 
                 value={editFormData.description}
-                onChange={(e) => updateEditFormData('description', e.target.value)}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  if (value.length <= 500) {
+                    updateEditFormData('description', value);
+                  }
+                }}
                 rows="3"
+                maxLength="500"
               />
+              <div style={{fontSize: '12px', color: '#666', textAlign: 'right', marginTop: '4px'}}>
+                {editFormData.description.length}/500 characters
+              </div>
             </div>
             
 
