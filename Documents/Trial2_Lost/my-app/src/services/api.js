@@ -50,6 +50,26 @@ if (storedToken) {
   api.defaults.headers.common['X-Auth-Token'] = storedToken;
 }
 
+// Add response interceptor to handle session expiry
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Session expired - clear auth data and redirect to pin screen
+      sessionStorage.removeItem('authenticated');
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('userName');
+      sessionStorage.removeItem('isAdmin');
+      delete api.defaults.headers.common['X-Auth-Token'];
+      delete api.defaults.headers.common['X-Is-Admin'];
+      
+      // Trigger redirect to pin screen
+      window.dispatchEvent(new CustomEvent('sessionExpired'));
+    }
+    return Promise.reject(error);
+  }
+);
+
 export const authAPI = {
   verifyPin: (pin) => api.post('/auth/verify-pin', { pin }),
   logout: () => api.post('/auth/logout')

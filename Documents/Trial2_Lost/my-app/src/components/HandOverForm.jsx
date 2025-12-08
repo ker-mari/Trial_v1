@@ -35,6 +35,28 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  // Handle browser back button
+  React.useEffect(() => {
+    const handlePopState = (event) => {
+      const hasData = formData.finderName || formData.finderGrade || formData.finderId || 
+                     formData.category !== 'Item' || formData.date || 
+                     formData.location !== 'Location' || formData.description;
+      
+      if (hasData) {
+        event.preventDefault();
+        window.history.pushState(null, '', window.location.pathname);
+        setShowCancelModal(true);
+      }
+    };
+
+    window.history.pushState(null, '', window.location.pathname);
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [formData]);
+
   const updateFormData = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
@@ -109,7 +131,7 @@ const HandOverForm = ({ userName, onSubmit, onNavigate }) => {
 
   const confirmCancel = () => {
     setShowCancelModal(false);
-    onNavigate('dashboard');
+    window.history.back();
   };
 
   return (

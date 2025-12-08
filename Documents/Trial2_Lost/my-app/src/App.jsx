@@ -73,6 +73,63 @@ function App() {
       // Auth token is automatically restored in api.js
     };
     restoreAuthState();
+
+    // Listen for session expiry events
+    const handleSessionExpired = () => {
+      setUserName('');
+      setIsAdmin(false);
+      setItems([]);
+      setHistoryItems([]);
+      setSelectedItem(null);
+      window.history.pushState({}, '', '/pin');
+      setScreen('pin');
+    };
+
+    window.addEventListener('sessionExpired', handleSessionExpired);
+
+    // Handle browser back/forward button
+    const handlePopState = (event) => {
+      const path = window.location.pathname;
+      const pathToScreen = {
+        '/': 'start',
+        '/pin': 'pin',
+        '/dashboard': 'dashboard',
+        '/view-items': 'viewItems',
+        '/hand-over': 'handOver',
+        '/history': 'history',
+        '/approval-queues': 'approvalQueues',
+        '/items-to-be-cleared': 'itemsToBeCleared',
+        '/claim-form': 'claimForm'
+      };
+      
+      const newScreen = pathToScreen[path] || 'start';
+      const adminOnlyScreens = ['approvalQueues', 'itemsToBeCleared'];
+      const currentIsAdmin = sessionStorage.getItem('isAdmin') === 'true';
+      
+      // Check admin access
+      if (adminOnlyScreens.includes(newScreen) && !currentIsAdmin) {
+        window.history.pushState({}, '', '/dashboard');
+        setScreen('dashboard');
+        return;
+      }
+      
+      // Force screen update
+      if (sessionStorage.getItem('authenticated') || ['start', 'pin'].includes(newScreen)) {
+        setScreen(newScreen);
+      } else {
+        setScreen('pin');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    // Trigger initial popstate to sync with current URL
+    handlePopState();
+    
+    return () => {
+      window.removeEventListener('sessionExpired', handleSessionExpired);
+      window.removeEventListener('popstate', handlePopState);
+    };
   }, []);
 
   useEffect(() => {
@@ -170,6 +227,13 @@ function App() {
   };
 
   const navigateToScreen = (screenName, item = null) => {
+    const adminOnlyScreens = ['approvalQueues', 'itemsToBeCleared'];
+    
+    // Block regular users from admin screens
+    if (adminOnlyScreens.includes(screenName) && !isAdmin) {
+      return;
+    }
+    
     if (item) setSelectedItem(item);
     setIsTransitioning(true);
     setTimeout(() => {
