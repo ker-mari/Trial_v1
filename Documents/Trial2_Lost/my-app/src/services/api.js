@@ -58,35 +58,50 @@ export const authAPI = {
 export const approvalAPI = {
   getPendingEdits: () => api.get('/pending-edits'),
   approve: (id) => api.post(`/pending-edits/${id}/approve`),
-  reject: (id) => api.post(`/pending-edits/${id}/reject`),
+  reject: (id, data) => api.post(`/pending-edits/${id}/reject`, data),
   createPendingEdit: (data) => api.post('/pending-edits', data),
 };
 
 export const itemsAPI = {
-  // Get all items
-  getAll: () => api.get('/items'),
-  
+  // Get all items (with pagination support)
+  getAll: (params = {}) => {
+    const { page = 1, per_page = 50 } = params;
+    return api.get('/items', { params: { page, per_page } });
+  },
+
   // Get single item
   getById: (id) => api.get(`/items/${id}`),
-  
+
   // Create new item
   create: (itemData) => api.post('/items', itemData),
-  
+
   // Update item
   update: (id, itemData) => api.put(`/items/${id}`, itemData),
-  
+
   // Delete item
   delete: (id) => api.delete(`/items/${id}`),
-  
+
   // Claim item
   claim: (id, data) => {
     const validId = /^[0-9]+$/.test(id) ? id : null;
     if (!validId) throw new Error('Invalid item ID');
     return api.post(`/items/${validId}/claim`, data);
   },
-  
-  // Get items to be cleared
-  getItemsToBeCleared: () => api.get('/items-to-be-cleared'),
+
+  // Get items to be cleared (with pagination support)
+  getItemsToBeCleared: (params = {}) => {
+    const { page = 1, per_page = 50 } = params;
+    return api.get('/items-to-be-cleared', { params: { page, per_page } });
+  },
+
+  // Get rejection comments for an item
+  getRejectionComments: (itemId) => api.get(`/items/${itemId}/rejection-comments`),
+
+  // Get history (with pagination support)
+  getHistory: (params = {}) => {
+    const { page = 1, per_page = 50 } = params;
+    return api.get('/history', { params: { page, per_page } });
+  },
 };
 
 export default api;

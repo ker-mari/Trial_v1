@@ -10,6 +10,7 @@ return new class extends Migration
     {
         Schema::create('history', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('item_id')->constrained()->onDelete('cascade');
             $table->date('date');
             $table->string('code', 1);
             $table->string('item_name');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\PendingEdit;
 use App\Models\Item;
+use App\Models\RejectionComment;
 use Illuminate\Http\Request;
 
 class ApprovalController extends Controller
@@ -103,20 +104,16 @@ class ApprovalController extends Controller
         // Mark as approved
         $pendingEdit->update(['status' => 'approved']);
 
-        // Log approval in history with authenticated user (only once)
-        \App\Models\History::firstOrCreate(
-            [
-                'item_id' => $item->id,
-                'status' => 'Edit Approved',
-                'officer' => $request->input('auth_user_name', 'Admin'),
-                'date' => now()->toDateString()
-            ],
-            [
-                'code' => $item->is_valuable ? 'V' : 'L',
-                'item_name' => $item->category,
-                'owner' => $pendingEdit->user_name
-            ]
-        );
+        // Log approval in history with authenticated user
+        \App\Models\History::create([
+            'item_id' => $item->id,
+            'date' => now()->toDateString(),
+            'code' => $item->is_valuable ? 'V' : 'L',
+            'item_name' => $item->category,
+            'owner' => $pendingEdit->user_name,
+            'status' => 'Edit Approved',
+            'officer' => $request->input('auth_user_name', 'Admin')
+        ]);
 
         return response()->json([
             'success' => true,
@@ -132,20 +129,27 @@ class ApprovalController extends Controller
         // Get the item for history logging
         $item = Item::findOrFail($pendingEdit->item_id);
 
-        // Log rejection in history with authenticated user (only once)
-        \App\Models\History::firstOrCreate(
-            [
+        // Save rejection comment if provided
+        $rejectionReason = $request->input('comments', '');
+        if (!empty($rejectionReason)) {
+            RejectionComment::create([
                 'item_id' => $item->id,
-                'status' => 'Edit Rejected',
-                'officer' => $request->input('auth_user_name', 'Admin'),
-                'date' => now()->toDateString()
-            ],
-            [
-                'code' => $item->is_valuable ? 'V' : 'L',
-                'item_name' => $item->category,
-                'owner' => $pendingEdit->user_name
-            ]
-        );
+                'pending_edit_id' => $pendingEdit->id,
+                'rejection_reason' => $rejectionReason,
+                'rejected_by' => $request->input('auth_user_name', 'Admin')
+            ]);
+        }
+
+        // Log rejection in history with authenticated user
+        \App\Models\History::create([
+            'item_id' => $item->id,
+            'date' => now()->toDateString(),
+            'code' => $item->is_valuable ? 'V' : 'L',
+            'item_name' => $item->category,
+            'owner' => $pendingEdit->user_name,
+            'status' => 'Edit Rejected',
+            'officer' => $request->input('auth_user_name', 'Admin')
+        ]);
 
         return response()->json(['message' => 'Edit rejected']);
     }

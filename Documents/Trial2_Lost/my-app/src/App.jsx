@@ -366,6 +366,10 @@ function App() {
         console.error('Update data sent:', updateData);
       }
 
+      // Close the edit form modal
+      setIsEditFormOpen(false);
+      setSelectedItem(null);
+
       // Show error in modal with more details
       const errorMessage = error.response?.data?.message || error.message;
       const validationErrors = error.response?.data?.errors;

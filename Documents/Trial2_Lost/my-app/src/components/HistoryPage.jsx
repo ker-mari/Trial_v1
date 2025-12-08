@@ -20,8 +20,8 @@ const HistoryPage = ({ historyItems }) => {
   const [selectedItem, setSelectedItem] = useState(null);
   const [dateSort, setDateSort] = useState(null); // 'asc' or 'desc'
   const [codeFilter, setCodeFilter] = useState('all'); // 'all', 'V', 'L'
-  const [clickingItem, setClickingItem] = useState(null);
   const [rejectionComments, setRejectionComments] = useState([]);
+  const [commentsCache, setCommentsCache] = useState({}); // Cache comments by item_id
   
   useEffect(() => {
     document.body.style.overflow = 'hidden';
@@ -148,33 +148,43 @@ const HistoryPage = ({ historyItems }) => {
                     </td>
                     <td>{item.officer || 'N/A'}</td>
                     <td>
-                      <button 
+                      <button
                         className="view-details-btn"
-                        disabled={clickingItem === item.id}
-                        onClick={async () => {
-                          if (clickingItem) return;
-                          setClickingItem(item.id);
-                          setSelectedItem(item);
-                          
-                          // Fetch rejection comments for any item
+                        onClick={() => {
                           const itemId = item.item_id || item.id;
-                          if (itemId) {
-                            try {
-                              const response = await itemsAPI.getRejectionComments(itemId);
-                              console.log('Rejection comments response:', response.data);
-                              setRejectionComments(response.data || []);
-                            } catch (error) {
-                              console.error('Failed to fetch rejection comments:', error);
-                              setRejectionComments([]);
+
+                          // Handle rejection comments before opening modal
+                          if (item.status === 'Edit Rejected' && itemId) {
+                            // Check if we have cached comments for this item
+                            if (commentsCache[itemId]) {
+                              // Use cached comments immediately
+                              setRejectionComments(commentsCache[itemId]);
+                              setSelectedItem(item);
+                            } else {
+                              // Set empty array but don't clear existing comments yet
+                              // Open modal immediately
+                              setSelectedItem(item);
+                              // Fetch comments in background
+                              itemsAPI.getRejectionComments(itemId)
+                                .then(response => {
+                                  const comments = response.data || [];
+                                  setRejectionComments(comments);
+                                  // Cache the comments
+                                  setCommentsCache(prev => ({...prev, [itemId]: comments}));
+                                })
+                                .catch(error => {
+                                  console.error('Failed to fetch rejection comments:', error);
+                                  setRejectionComments([]);
+                                });
                             }
                           } else {
+                            // For non-rejected items, clear comments and open modal
                             setRejectionComments([]);
+                            setSelectedItem(item);
                           }
-                          
-                          setTimeout(() => setClickingItem(null), 500);
                         }}
                       >
-                        {clickingItem === item.id ? 'Loading...' : 'View Details'}
+                        View Details
                       </button>
                     </td>
                   </tr>
@@ -227,31 +237,39 @@ const HistoryPage = ({ historyItems }) => {
                 <hr className="history-modal-divider" />
                 <p className="history-modal-info-label">Description</p>
                 <p className="history-modal-info-value">{selectedItem.description || 'N/A'}</p>
-                {/* Always show rejection comments section for debugging */}
-                <p className="history-modal-info-label" style={{marginTop: '1rem', color: '#e74c3c'}}>
-                  Admin Comments ({rejectionComments.length} found)
-                </p>
-                {rejectionComments.length > 0 ? (
-                  rejectionComments.map((comment, index) => (
-                    <div key={index} style={{
-                      padding: '0.75rem',
+
+                {selectedItem.status === 'Edit Rejected' && rejectionComments.length > 0 && (
+                  <div style={{marginTop: '1.5rem'}}>
+                    <p className="history-modal-info-label" style={{color: '#dc3545', fontWeight: '600'}}>
+                      Admin Comment
+                    </p>
+                    <div style={{
+                      padding: '1rem',
                       background: '#fff5f5',
-                      border: '1px solid #ffcccc',
-                      borderRadius: '6px',
-                      color: '#c0392b',
-                      fontStyle: 'italic',
+                      border: '2px solid #dc3545',
+                      borderRadius: '8px',
+                      marginTop: '0.5rem',
                       marginBottom: '0.5rem'
                     }}>
-                      <p style={{margin: 0, marginBottom: '0.25rem'}}>
-                        <strong>Reason:</strong> {comment.rejection_reason || 'No reason provided'}
+                      <p style={{
+                        margin: 0,
+                        color: '#721c24',
+                        fontSize: '0.95rem',
+                        lineHeight: '1.5',
+                        fontStyle: 'italic'
+                      }}>
+                        {rejectionComments[0].rejection_reason}
                       </p>
-                      <p style={{margin: 0, fontSize: '0.85em', opacity: 0.8}}>
-                        By: {comment.user_name} • {new Date(comment.created_at).toLocaleDateString()}
+                      <p style={{
+                        margin: '0.5rem 0 0 0',
+                        color: '#999',
+                        fontSize: '0.85rem',
+                        textAlign: 'right'
+                      }}>
+                        — {rejectionComments[0].rejected_by} on {new Date(rejectionComments[0].created_at).toLocaleDateString()}
                       </p>
                     </div>
-                  ))
-                ) : (
-                  <p style={{color: '#666', fontStyle: 'italic'}}>No admin comments available</p>
+                  </div>
                 )}
                 <hr className="history-modal-divider" />
                 <div className="history-two-column-info">
@@ -273,13 +291,13 @@ const HistoryPage = ({ historyItems }) => {
                   <div className="history-info-column">
                     <p className="history-modal-info-label">Claimer's Information <span className="tagalog-hint">(Detalye ng nag-claim)</span></p>
                     <div className="history-info-item">
-                      <strong>Name:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.owner || selectedItem.claimer_name || 'N/A')}
+                      <strong>Name:</strong> {(selectedItem.status === 'Admin Edit' || selectedItem.status === 'Edit Approved' || selectedItem.status === 'Edit Rejected') ? 'N/A' : (selectedItem.owner || selectedItem.claimer_name || 'N/A')}
                     </div>
                     <div className="history-info-item">
-                      <strong>Grade/Course:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.claimer_grade || selectedItem.owner_grade || 'N/A')}
+                      <strong>Grade/Course:</strong> {(selectedItem.status === 'Admin Edit' || selectedItem.status === 'Edit Approved' || selectedItem.status === 'Edit Rejected') ? 'N/A' : (selectedItem.claimer_grade || selectedItem.owner_grade || 'N/A')}
                     </div>
                     <div className="history-info-item">
-                      <strong>ID Number:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.claimer_id || selectedItem.owner_id || 'N/A')}
+                      <strong>ID Number:</strong> {(selectedItem.status === 'Admin Edit' || selectedItem.status === 'Edit Approved' || selectedItem.status === 'Edit Rejected') ? 'N/A' : (selectedItem.claimer_id || selectedItem.owner_id || 'N/A')}
                     </div>
                     <div className="history-info-item">
                       <strong>Status:</strong> 

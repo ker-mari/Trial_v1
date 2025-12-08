@@ -10,6 +10,7 @@ class HistorySeeder extends Seeder
     public function run(): void
     {
         History::create([
+            'item_id' => 1,
             'date' => now()->subDays(3)->toDateString(),
             'code' => 'V',
             'item_name' => 'Smartphone',
@@ -20,6 +21,7 @@ class HistorySeeder extends Seeder
         ]);
 
         History::create([
+            'item_id' => 2,
             'date' => now()->subDays(5)->toDateString(),
             'code' => 'L',
             'item_name' => 'Hair Clip',
@@ -30,6 +32,7 @@ class HistorySeeder extends Seeder
         ]);
 
         History::create([
+            'item_id' => 3,
             'date' => now()->subDays(10)->toDateString(),
             'code' => 'L',
             'item_name' => 'Notebook',
@@ -40,6 +43,7 @@ class HistorySeeder extends Seeder
         ]);
 
         History::create([
+            'item_id' => 4,
             'date' => now()->subDays(7)->toDateString(),
             'code' => 'V',
             'item_name' => 'Watch',

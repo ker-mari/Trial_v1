@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pins', function (Blueprint $table) {
             $table->id();
-            $table->string('pin_hash')->unique(); // Store hashed PIN
+            $table->string('pin_hash');
             $table->string('user_name');
             $table->boolean('is_admin')->default(false);
             $table->boolean('is_active')->default(true);

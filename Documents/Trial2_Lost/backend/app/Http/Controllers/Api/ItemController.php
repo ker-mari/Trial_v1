@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Models\Item;
 use App\Models\History;
+use App\Models\RejectionComment;
 use App\Rules\ValidBase64Image;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -14,13 +15,25 @@ use Illuminate\Support\Facades\Log;
 class ItemController extends Controller
 {
 
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $perPage = min(max((int)$perPage, 1), 100); // Limit between 1-100
+
         $items = Item::where('status', 'available')
                     ->orderBy('created_at', 'desc')
-                    ->get();
+                    ->paginate($perPage);
+
         return response()->json([
-            'data' => $items
+            'data' => $items->items(),
+            'pagination' => [
+                'current_page' => $items->currentPage(),
+                'last_page' => $items->lastPage(),
+                'per_page' => $items->perPage(),
+                'total' => $items->total(),
+                'from' => $items->firstItem(),
+                'to' => $items->lastItem()
+            ]
         ]);
     }
 
@@ -52,41 +65,16 @@ class ItemController extends Controller
             $validated['image'] = $this->compressBase64Image($validated['image']);
         }
 
-        // Improved retry logic with exponential backoff
-        $maxAttempts = 10;
-        $attempt = 0;
-        $item = null;
-
-        while ($attempt < $maxAttempts) {
-            try {
-                $item = DB::transaction(function () use ($validated) {
-                    // Use UUID-based item_no to prevent race conditions
-                    if (empty($validated['item_no'])) {
-                        $validated['item_no'] = time() . rand(100, 999);
-                    }
-                    return Item::create($validated);
-                }, 3); // 3 second timeout
-                break;
-            } catch (\Illuminate\Database\QueryException $e) {
-                $attempt++;
-                if (str_contains($e->getMessage(), 'UNIQUE constraint failed') || 
-                    str_contains($e->getMessage(), 'Duplicate entry')) {
-                    if ($attempt >= $maxAttempts) {
-                        Log::error('Max retry attempts reached for item creation', ['attempt' => $attempt]);
-                        return response()->json([
-                            'success' => false,
-                            'message' => 'System busy, please try again in a moment'
-                        ], 503);
-                    }
-                    // Exponential backoff: 100ms, 200ms, 400ms, etc.
-                    usleep(100000 * pow(2, min($attempt - 1, 4)));
-                    continue;
-                }
-                throw $e;
-            } catch (\Exception $e) {
-                Log::error('Item creation failed', ['error' => $e->getMessage()]);
-                throw $e;
-            }
+        // Simple item creation with unique item_no
+        try {
+            $validated['item_no'] = time() . rand(100, 999);
+            $item = Item::create($validated);
+        } catch (\Exception $e) {
+            Log::error('Item creation failed', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to create item: ' . $e->getMessage()
+            ], 500);
         }
 
         return response()->json([
@@ -272,17 +260,28 @@ class ItemController extends Controller
         ]);
     }
 
-    public function itemsToBeCleared(): JsonResponse
+    public function itemsToBeCleared(Request $request): JsonResponse
     {
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $perPage = min(max((int)$perPage, 1), 100); // Limit between 1-100
+
         $items = Item::available()
                     ->olderThan(7)
                     ->where('is_valuable', false)
                     ->select(['id', 'category', 'location', 'description', 'date_time', 'created_at'])
-                    ->get();
-        
+                    ->paginate($perPage);
+
         return response()->json([
             'success' => true,
-            'data' => $items
+            'data' => $items->items(),
+            'pagination' => [
+                'current_page' => $items->currentPage(),
+                'last_page' => $items->lastPage(),
+                'per_page' => $items->perPage(),
+                'total' => $items->total(),
+                'from' => $items->firstItem(),
+                'to' => $items->lastItem()
+            ]
         ]);
     }
 
@@ -296,45 +295,67 @@ class ItemController extends Controller
         ]);
     }
     
-    public function getAllHistory(): JsonResponse
+    public function getAllHistory(Request $request): JsonResponse
     {
-        $history = History::with('item')
-            ->whereNotIn('status', ['Approved', 'Rejected', 'Handed Over'])
-            ->orderBy('created_at', 'desc')
-            ->get()
-            ->map(function ($historyRecord) {
-                $item = $historyRecord->item;
-                return [
-                    'id' => $historyRecord->id,
-                    'item_id' => $historyRecord->item_id,
-                    'item_no' => $item->item_no ?? null,
-                    'date' => $historyRecord->date,
-                    'code' => $historyRecord->code,
-                    'item_name' => $historyRecord->item_name,
-                    'category' => $item->category ?? null,
-                    'description' => $item->description ?? null,
-                    'location' => $item->location ?? null,
-                    'date_time' => $item->date_time ?? null,
-                    'image' => $item->image ?? null,
-                    'is_valuable' => $item->is_valuable ?? false,
-                    'finder_name' => $item->finder_name ?? null,
-                    'finder_grade' => $item->finder_grade ?? null,
-                    'finder_id' => $item->finder_id ?? null,
-                    'claimer_name' => $item->claimer_name ?? null,
-                    'claimer_grade' => $item->claimer_grade ?? null,
-                    'claimer_id' => $item->claimer_id ?? null,
-                    'claim_date' => $item->claim_date ?? null,
-                    'owner' => $historyRecord->owner,
-                    'status' => $historyRecord->status,
-                    'officer' => $historyRecord->officer,
-                    'created_at' => $historyRecord->created_at,
-                    'updated_at' => $historyRecord->updated_at
-                ];
-            });
-        
+        $perPage = $request->input('per_page', 50); // Default 50 items per page
+        $perPage = min(max((int)$perPage, 1), 100); // Limit between 1-100
+
+        $historyQuery = History::with('item')
+            ->whereNotIn('status', ['Approved', 'Handed Over'])
+            ->orderBy('created_at', 'desc');
+
+        $history = $historyQuery->paginate($perPage);
+
+        $mappedData = $history->getCollection()->map(function ($historyRecord) {
+            $item = $historyRecord->item;
+            return [
+                'id' => $historyRecord->id,
+                'item_id' => $historyRecord->item_id,
+                'item_no' => $item->item_no ?? null,
+                'date' => $historyRecord->date,
+                'code' => $historyRecord->code,
+                'item_name' => $historyRecord->item_name,
+                'category' => $item->category ?? null,
+                'description' => $item->description ?? null,
+                'location' => $item->location ?? null,
+                'date_time' => $item->date_time ?? null,
+                'image' => $item->image ?? null,
+                'is_valuable' => $item->is_valuable ?? false,
+                'finder_name' => $item->finder_name ?? null,
+                'finder_grade' => $item->finder_grade ?? null,
+                'finder_id' => $item->finder_id ?? null,
+                'claimer_name' => $item->claimer_name ?? null,
+                'claimer_grade' => $item->claimer_grade ?? null,
+                'claimer_id' => $item->claimer_id ?? null,
+                'claim_date' => $item->claim_date ?? null,
+                'owner' => $historyRecord->owner,
+                'status' => $historyRecord->status,
+                'officer' => $historyRecord->officer,
+                'created_at' => $historyRecord->created_at,
+                'updated_at' => $historyRecord->updated_at
+            ];
+        });
+
         return response()->json([
             'success' => true,
-            'data' => $history
+            'data' => $mappedData,
+            'pagination' => [
+                'current_page' => $history->currentPage(),
+                'last_page' => $history->lastPage(),
+                'per_page' => $history->perPage(),
+                'total' => $history->total(),
+                'from' => $history->firstItem(),
+                'to' => $history->lastItem()
+            ]
         ]);
+    }
+
+    public function getRejectionComments($itemId): JsonResponse
+    {
+        $comments = RejectionComment::where('item_id', $itemId)
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return response()->json($comments);
     }
 }

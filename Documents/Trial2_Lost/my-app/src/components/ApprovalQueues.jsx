@@ -115,7 +115,7 @@ const ApprovalQueues = () => {
 
     setProcessing(true);
     try {
-      await approvalAPI.reject(selectedEdit.id, { comment: rejectComment });
+      await approvalAPI.reject(selectedEdit.id, { comments: rejectComment });
 
       // Log to history
       const historyEntry = {

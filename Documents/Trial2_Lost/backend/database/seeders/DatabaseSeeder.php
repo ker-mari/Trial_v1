@@ -101,32 +101,7 @@ class DatabaseSeeder extends Seeder
             'claim_date' => now()->subDays(2),
         ]);
 
-        // Create history records
-        History::create([
-            'date' => now()->subDays(2)->toDateString(),
-            'code' => 'V',
-            'item_name' => 'Wireless earbuds',
-            'owner' => 'Alice Johnson',
-            'status' => 'Claimed',
-            'officer' => 'Test Guard',
-        ]);
-
-        History::create([
-            'date' => now()->subDays(5)->toDateString(),
-            'code' => 'V',
-            'item_name' => 'Black iPhone with cracked screen',
-            'owner' => null,
-            'status' => 'Handed Over',
-            'officer' => 'Test Guard',
-        ]);
-
-        History::create([
-            'date' => now()->subDays(3)->toDateString(),
-            'code' => 'L',
-            'item_name' => 'Blue water bottle with stickers',
-            'owner' => null,
-            'status' => 'Handed Over',
-            'officer' => 'Test Admin',
-        ]);
+        // Seed 1000 items
+        $this->call(ItemSeeder::class);
     }
 }
