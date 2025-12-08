@@ -180,7 +180,7 @@ class ItemController extends Controller
             'date' => now()->toDateString(),
             'code' => $item->is_valuable ? 'V' : 'L',
             'item_name' => $item->category,
-            'owner' => null,
+            'owner' => 'Admin',
             'status' => 'Admin Edit',
             'officer' => $request->input('auth_user_name', 'Admin')
         ]);

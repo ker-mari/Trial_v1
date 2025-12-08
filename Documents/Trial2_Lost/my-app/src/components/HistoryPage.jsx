@@ -273,13 +273,13 @@ const HistoryPage = ({ historyItems }) => {
                   <div className="history-info-column">
                     <p className="history-modal-info-label">Claimer's Information <span className="tagalog-hint">(Detalye ng nag-claim)</span></p>
                     <div className="history-info-item">
-                      <strong>Name:</strong> {selectedItem.owner || selectedItem.claimer_name || 'N/A'}
+                      <strong>Name:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.owner || selectedItem.claimer_name || 'N/A')}
                     </div>
                     <div className="history-info-item">
-                      <strong>Grade/Course:</strong> {selectedItem.claimer_grade || selectedItem.owner_grade || 'N/A'}
+                      <strong>Grade/Course:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.claimer_grade || selectedItem.owner_grade || 'N/A')}
                     </div>
                     <div className="history-info-item">
-                      <strong>ID Number:</strong> {selectedItem.claimer_id || selectedItem.owner_id || 'N/A'}
+                      <strong>ID Number:</strong> {selectedItem.status === 'Admin Edit' ? 'N/A' : (selectedItem.claimer_id || selectedItem.owner_id || 'N/A')}
                     </div>
                     <div className="history-info-item">
                       <strong>Status:</strong> 
