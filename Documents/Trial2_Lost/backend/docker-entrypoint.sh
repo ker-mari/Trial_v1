@@ -17,7 +17,9 @@ echo "Running storage link..."
 php artisan storage:link || true   # skip if already exists
 
 echo "Running migrations and seeding..."
-php artisan migrate:fresh --seed
+php artisan migrate --seed
+php artisan db:seed --class=ItemSeeder
+
 
 
 
