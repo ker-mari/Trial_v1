@@ -88,7 +88,6 @@ class AuthController extends Controller
                     'auth_token' => $authToken,
                     'token' => $authToken,
                     'access_token' => $authToken,
-                    'expires_in' => 1800,
                     'message' => 'PIN verified successfully'
                 ]);
             }
