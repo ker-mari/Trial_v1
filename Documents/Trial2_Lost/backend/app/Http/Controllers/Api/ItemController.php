@@ -87,20 +87,20 @@ class ItemController extends Controller
     private function compressBase64Image($base64Image, $quality = 70)
     {
         try {
-            // Extract image data
+            
             if (preg_match('/^data:image\/(\w+);base64,/', $base64Image, $matches)) {
                 $imageData = substr($base64Image, strpos($base64Image, ',') + 1);
                 $imageData = base64_decode($imageData);
                 
-                // Create image resource
+                
                 $image = imagecreatefromstring($imageData);
                 if (!$image) return $base64Image;
                 
-                // Get dimensions and compress if too large
+                
                 $width = imagesx($image);
                 $height = imagesy($image);
                 
-                // Resize if larger than 800px
+                
                 if ($width > 800 || $height > 800) {
                     $ratio = min(800 / $width, 800 / $height);
                     $newWidth = (int)($width * $ratio);

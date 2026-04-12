@@ -11,7 +11,7 @@ class ItemSeeder extends Seeder
     {
         // Recent items (within 7 days)
         Item::create([
-            'item_no' => 1001,
+            'item_no' => 1,
             'category' => 'School Supplies',
             'location' => 'EFS 2nd Floor',
             'date_time' => now()->subDays(3)->format('Y-m-d H:i:s'),
@@ -26,7 +26,7 @@ class ItemSeeder extends Seeder
         ]);
 
         Item::create([
-            'item_no' => 1002,
+            'item_no' => 2,
             'category' => 'Gadgets / Electronics',
             'location' => 'Lobby 2 (Lost and Found Location)',
             'date_time' => now()->subDays(5)->format('Y-m-d H:i:s'),
@@ -42,7 +42,7 @@ class ItemSeeder extends Seeder
 
         // Old items (past 7 days - eligible for clearing)
         Item::create([
-            'item_no' => 1003,
+            'item_no' => 3,
             'category' => 'Personal Belongings',
             'location' => 'DSR 1st Floor',
             'date_time' => now()->subDays(10)->format('Y-m-d H:i:s'),
@@ -57,7 +57,7 @@ class ItemSeeder extends Seeder
         ]);
 
         Item::create([
-            'item_no' => 1004,
+            'item_no' => 4,
             'category' => 'School Supplies',
             'location' => 'Entrance Lobby',
             'date_time' => now()->subDays(15)->format('Y-m-d H:i:s'),
@@ -72,7 +72,7 @@ class ItemSeeder extends Seeder
         ]);
 
         Item::create([
-            'item_no' => 1005,
+            'item_no' => 5,
             'category' => 'Clothing',
             'location' => 'EFS 3rd Floor',
             'date_time' => now()->subDays(20)->format('Y-m-d H:i:s'),
