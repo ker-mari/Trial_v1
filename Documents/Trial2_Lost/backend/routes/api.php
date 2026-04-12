@@ -40,7 +40,8 @@ Route::get('test-db', function () {
 });
 
 
-Route::middleware(['auth:sanctum'])->group(function () {
+// Use the custom PIN authentication middleware instead of Sanctum
+Route::middleware([\App\Http\Middleware\CheckPinAuth::class])->group(function () {
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
