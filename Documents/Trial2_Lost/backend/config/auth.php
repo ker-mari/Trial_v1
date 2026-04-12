@@ -41,7 +41,6 @@ return [
         'provider' => 'users',
     ],
 
-    // ADD THIS BLOCK:
     'sanctum' => [
         'driver' => 'sanctum',
         'provider' => 'users',
