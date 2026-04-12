@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 
 class CheckPinAuth
 {
@@ -16,10 +17,16 @@ class CheckPinAuth
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // Get auth token from header
-        $authToken = $request->header('X-Auth-Token');
+        // Allow CORS preflight requests to pass through without auth
+        if ($request->isMethod('OPTIONS')) {
+            return $next($request);
+        }
+
+        // Get auth token from custom header or standard Bearer token
+        $authToken = $request->header('X-Auth-Token') ?: $request->bearerToken();
 
         if (!$authToken) {
+            Log::warning('CheckPinAuth: No auth token provided in request headers.');
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication required. Please log in.'
@@ -31,18 +38,24 @@ class CheckPinAuth
         
         // Fallback: check database if cache fails (for production stability)
         if (!$sessionData && strlen($authToken) === 32) {
-            $sessionData = \Illuminate\Support\Facades\DB::table('cache')
-                ->where('key', 'auth_token:' . $authToken)
-                ->where('expiration', '>', time())
-                ->value('value');
-            if ($sessionData) {
-                $sessionData = unserialize($sessionData);
-                // Restore to cache
-                Cache::put('auth_token:' . $authToken, $sessionData, 1800);
+            try {
+                $prefix = Cache::getStore()->getPrefix();
+                $dbSession = \Illuminate\Support\Facades\DB::table('cache')
+                    ->where('key', $prefix . 'auth_token:' . $authToken)
+                    ->where('expiration', '>', time())
+                    ->value('value');
+                if ($dbSession) {
+                    $sessionData = is_string($dbSession) ? unserialize($dbSession) : $dbSession;
+                    // Restore to cache
+                    Cache::put('auth_token:' . $authToken, $sessionData, 1800);
+                }
+            } catch (\Exception $e) {
+                // Ignore DB fallback errors if the cache table doesn't exist
             }
         }
 
         if (!$sessionData) {
+            Log::warning('CheckPinAuth: Session expired or invalid token', ['token' => $authToken]);
             return response()->json([
                 'success' => false,
                 'message' => 'Session expired. Please log in again.'
@@ -58,4 +71,3 @@ class CheckPinAuth
         return $next($request);
     }
 }
-
