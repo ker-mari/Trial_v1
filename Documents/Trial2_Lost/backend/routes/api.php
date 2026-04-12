@@ -56,9 +56,8 @@ Route::get('test-db', function () {
     }
 });
 
-// Protected routes - require authentication
-Route::middleware(['pin.auth'])->group(function () {
-    // Items API routes with route model binding
+
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
