@@ -57,7 +57,7 @@ Route::get('test-db', function () {
 });
 
 
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['pin:auth'])->group(function () {
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
