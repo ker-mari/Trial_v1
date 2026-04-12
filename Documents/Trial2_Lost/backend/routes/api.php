@@ -12,6 +12,23 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
+Route::get('/run-migrations', function () {
+    try {
+        Artisan::call('migrate', ['--force' => true]);
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Migrations ran successfully!',
+            'output' => Artisan::output()
+        ]);
+    } catch (\Exception $e) {
+        return response()->json([
+            'success' => false,
+            'error' => $e->getMessage()
+        ], 500);
+    }
+});
+
 // Authentication routes (public - no auth required)
 Route::post('auth/verify-pin', [AuthController::class, 'verifyPin'])->middleware('throttle:10,1');
 Route::post('auth/logout', [AuthController::class, 'logout'])->middleware('throttle:10,1');
