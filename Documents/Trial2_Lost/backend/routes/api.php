@@ -7,16 +7,15 @@ use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ApprovalController;
 
-
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Authentication routes (public - no auth required)
+
 Route::post('auth/verify-pin', [AuthController::class, 'verifyPin'])->middleware('throttle:10,1');
 Route::post('auth/logout', [AuthController::class, 'logout'])->middleware('throttle:10,1');
 
-// Database test route (public for testing)
+
 Route::get('test-db', function () {
     try {
         $count = \App\Models\Item::count();
@@ -26,10 +25,8 @@ Route::get('test-db', function () {
             'items_count' => $count
         ]);
     } catch (\Exception $e) {
-        // Log the detailed error for debugging
         Log::error('Database connection test failed: ' . $e->getMessage());
 
-        // Return sanitized error message (hide details in production)
         return response()->json([
             'success' => false,
             'message' => config('app.debug')
@@ -39,9 +36,8 @@ Route::get('test-db', function () {
     }
 });
 
-// Protected routes - require authentication
-Route::middleware(['pin.auth'])->group(function () {
-    // Items API routes with route model binding
+Route::middleware(['auth:sanctum'])->group(function () {
+    
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
