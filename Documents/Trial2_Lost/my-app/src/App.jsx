@@ -123,8 +123,10 @@ function App() {
 
     window.addEventListener('popstate', handlePopState);
     
-    // Trigger initial popstate to sync with current URL
-    handlePopState();
+    // Only trigger initial popstate if not already authenticated
+    if (!sessionStorage.getItem('authenticated')) {
+      handlePopState();
+    }
     
     return () => {
       window.removeEventListener('sessionExpired', handleSessionExpired);
@@ -245,11 +247,13 @@ function App() {
   };
 
   const handlePinSubmit = async (name, adminStatus = false, authToken = null) => {
-    setUserName(name);
-    setIsAdmin(adminStatus);
+    // Set authentication state first
     sessionStorage.setItem('authenticated', 'true');
     sessionStorage.setItem('isAdmin', adminStatus.toString());
     sessionStorage.setItem('userName', name);
+    
+    setUserName(name);
+    setIsAdmin(adminStatus);
 
     // Set auth token and admin header for API requests
     const { setAuthToken, setAdminHeader } = await import('./services/api.js');
@@ -258,6 +262,7 @@ function App() {
     }
     setAdminHeader(adminStatus);
 
+    // Navigate to dashboard after setting authentication
     navigateToScreen('dashboard');
   };
 

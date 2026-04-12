@@ -18,7 +18,7 @@ const PinScreen = ({ onPinSubmit }) => {
       if (data.success) {
         // Pass auth token along with user data
         onPinSubmit(data.user_name, data.is_admin, data.auth_token);
-        return
+        return;
       } else {
         if (import.meta.env.DEV) {
           console.log("PIN verification failed:", data.message);
