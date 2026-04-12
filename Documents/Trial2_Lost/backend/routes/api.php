@@ -12,23 +12,6 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-Route::get('/run-migrations', function () {
-    try {
-        Artisan::call('migrate', ['--force' => true]);
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Migrations ran successfully!',
-            'output' => Artisan::output()
-        ]);
-    } catch (\Exception $e) {
-        return response()->json([
-            'success' => false,
-            'error' => $e->getMessage()
-        ], 500);
-    }
-});
-
 // Authentication routes (public - no auth required)
 Route::post('auth/verify-pin', [AuthController::class, 'verifyPin'])->middleware('throttle:10,1');
 Route::post('auth/logout', [AuthController::class, 'logout'])->middleware('throttle:10,1');
@@ -57,7 +40,7 @@ Route::get('test-db', function () {
 });
 
 
-Route::middleware(['pin:auth'])->group(function () {
+Route::middleware(['auth:sanctum'])->group(function () {
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
