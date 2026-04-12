@@ -11,18 +11,33 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Validator;
 
 class AuthController extends Controller
 {
     public function verifyPin(Request $request): JsonResponse
     {
         try {
-            // Validate input
-            $request->validate([
-                'pin' => 'required|string|min:4|max:10'
+            // Validate input without throwing exceptions
+            $validator = Validator::make($request->all(), [
+                'pin' => 'required'
             ]);
 
-            $inputPin = trim($request->input('pin'));
+            if ($validator->fails()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'PIN is required'
+                ], 422);
+            }
+
+            $inputPin = trim((string) $request->input('pin'));
+
+            if (strlen($inputPin) < 4 || strlen($inputPin) > 10) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'PIN must be between 4 and 10 characters'
+                ], 422);
+            }
 
             // Cache active pins for 10 minutes with hash map for faster lookup
             $pins = Cache::remember('active_pins_hash_map', 600, function () {
@@ -67,6 +82,8 @@ class AuthController extends Controller
                     'user_name' => $validPin->user_name,
                     'is_admin' => $validPin->is_admin,
                     'auth_token' => $authToken,
+                    'token' => $authToken,
+                    'access_token' => $authToken,
                     'expires_in' => 1800,
                     'message' => 'PIN verified successfully'
                 ]);
