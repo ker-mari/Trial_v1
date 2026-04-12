@@ -22,11 +22,17 @@ class CheckPinAuth
             return $next($request);
         }
 
-        // Get auth token from custom header or standard Bearer token
-        $authToken = $request->header('X-Auth-Token') ?: $request->bearerToken();
+        // Get auth token from custom header, standard Bearer token, or query string
+        $authToken = $request->header('X-Auth-Token') 
+            ?: $request->bearerToken() 
+            ?: $request->query('token');
 
         if (!$authToken) {
-            Log::warning('CheckPinAuth: No auth token provided in request headers.');
+            // If you see this in Render logs, the FRONTEND is failing to send the token
+            Log::warning('CheckPinAuth: NO TOKEN IN REQUEST. Check frontend Axios setup.', [
+                'url' => $request->fullUrl(),
+                'headers' => $request->headers->all()
+            ]);
             return response()->json([
                 'success' => false,
                 'message' => 'Authentication required. Please log in.'
@@ -35,6 +41,14 @@ class CheckPinAuth
 
         // Verify token exists in cache (session store) with fallback to database
         $sessionData = Cache::get('auth_token:' . $authToken);
+
+        if (!$sessionData) {
+            // If you see this in Render logs, the BACKEND CACHE is wiping the token
+            Log::error('CheckPinAuth: Token received, but MISSING FROM CACHE. Check CACHE_DRIVER in .env', [
+                'token' => $authToken,
+                'cache_driver' => config('cache.default')
+            ]);
+        }
         
         // Fallback: check database if cache fails (for production stability)
         if (!$sessionData && strlen($authToken) === 32) {
