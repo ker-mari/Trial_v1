@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Api\ItemController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\ApprovalController;
-
+use Illuminate\Support\Facades\Artisan;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
