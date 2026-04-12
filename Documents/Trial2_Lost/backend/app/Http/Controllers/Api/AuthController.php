@@ -79,6 +79,10 @@ class AuthController extends Controller
 
                 return response()->json([
                     'success' => true,
+                    'user' => [
+                        'name' => $validPin->user_name,
+                        'is_admin' => $validPin->is_admin,
+                    ],
                     'user_name' => $validPin->user_name,
                     'is_admin' => $validPin->is_admin,
                     'auth_token' => $authToken,
@@ -107,7 +111,8 @@ class AuthController extends Controller
 
     public function logout(Request $request): JsonResponse
     {
-        $authToken = $request->header('X-Auth-Token');
+        // Support standard Bearer token as well as custom X-Auth-Token header
+        $authToken = $request->bearerToken() ?: $request->header('X-Auth-Token');
 
         if ($authToken) {
             // Remove token from cache
