@@ -27,3 +27,9 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# Amazon Q
+.amazonq/
+.aws/amazonq/
+*.amazonq
+.q/

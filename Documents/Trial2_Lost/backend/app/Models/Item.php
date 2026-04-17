@@ -52,7 +52,7 @@ class Item extends Model
 
     public function scopeOlderThan(Builder $query, int $days): Builder
     {
-        return $query->whereDate('date_handed_over', '<=', now()->subDays($days));
+        return $query->whereDate('date_time', '<=', now()->subDays($days));
     }
 
     public function getFormattedDateTimeAttribute()
