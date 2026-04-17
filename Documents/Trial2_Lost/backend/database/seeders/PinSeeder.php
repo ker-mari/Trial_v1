@@ -12,7 +12,7 @@ class PinSeeder extends Seeder
     {
         Pin::create([
             'pin_hash' => Hash::make('391847'),
-            'user_name' => 'Mrs. Laura Sabillon',
+            'user_name' => 'Mr. Eric Pader',
             'is_admin' => true,
             'is_active' => true
         ]);

@@ -12,35 +12,10 @@ Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
 
-// Authentication routes (public - no auth required)
+
 Route::post('auth/verify-pin', [AuthController::class, 'verifyPin'])->middleware('throttle:10,1');
 Route::post('auth/logout', [AuthController::class, 'logout'])->middleware('throttle:10,1');
 
-// Database test route (public for testing)
-Route::get('test-db', function () {
-    try {
-        $count = \App\Models\Item::count();
-        return response()->json([
-            'success' => true,
-            'message' => 'Database connected successfully',
-            'items_count' => $count
-        ]);
-    } catch (\Exception $e) {
-        // Log the detailed error for debugging
-        Log::error('Database connection test failed: ' . $e->getMessage());
-
-        // Return sanitized error message (hide details in production)
-        return response()->json([
-            'success' => false,
-            'message' => config('app.debug')
-                ? 'Database connection failed: ' . $e->getMessage()
-                : 'Database connection failed. Please check server logs.'
-        ], 500);
-    }
-});
-
-
-// Use the custom PIN authentication middleware instead of Sanctum
 Route::middleware([\App\Http\Middleware\CheckPinAuth::class])->group(function () {
     Route::apiResource('items', ItemController::class)->middleware('throttle:60,1');
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
@@ -48,6 +23,7 @@ Route::middleware([\App\Http\Middleware\CheckPinAuth::class])->group(function ()
     Route::get('items/{item}/rejection-comments', [ItemController::class, 'getRejectionComments'])->middleware('throttle:60,1');
     Route::get('items-to-be-cleared', [ItemController::class, 'itemsToBeCleared'])->middleware('throttle:60,1');
     Route::get('history', [ItemController::class, 'getAllHistory'])->middleware('throttle:60,1');
+    
 
     // Non-admin users can submit edits for approval
     Route::post('pending-edits', [ApprovalController::class, 'store'])->middleware('throttle:10,1');

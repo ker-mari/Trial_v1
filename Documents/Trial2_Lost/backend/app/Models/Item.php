@@ -38,6 +38,8 @@ class Item extends Model
         'updated_at' => 'datetime'
     ];
 
+    protected $appends = ['formatted_date_time'];
+
     public function history(): HasMany
     {
         return $this->hasMany(History::class);
@@ -51,6 +53,11 @@ class Item extends Model
     public function scopeOlderThan(Builder $query, int $days): Builder
     {
         return $query->whereDate('date_handed_over', '<=', now()->subDays($days));
+    }
+
+    public function getFormattedDateTimeAttribute()
+    {
+        return $this->date_time ? $this->date_time->format('M j, Y g:i A') : null;
     }
 
     protected static function boot()

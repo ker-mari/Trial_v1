@@ -65,9 +65,12 @@ class ItemController extends Controller
             $validated['image'] = $this->compressBase64Image($validated['image']);
         }
 
-        // Simple item creation with unique item_no
+        // Generate sequential item number starting from 1
         try {
-            $validated['item_no'] = time() . rand(100, 999);
+            $validated['item_no'] = DB::transaction(function () {
+                $maxItemNo = Item::max('item_no') ?? 0;
+                return $maxItemNo + 1;
+            });
             $item = Item::create($validated);
         } catch (\Exception $e) {
             Log::error('Item creation failed', ['error' => $e->getMessage()]);
