@@ -143,6 +143,7 @@ class ApprovalController extends Controller
         // Log rejection in history with authenticated user
         \App\Models\History::create([
             'item_id' => $item->id,
+            'pending_edit_id' => $pendingEdit->id,
             'date' => now()->toDateString(),
             'code' => $item->is_valuable ? 'V' : 'L',
             'item_name' => $item->category,

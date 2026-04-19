@@ -290,11 +290,28 @@ class ItemController extends Controller
 
     public function getHistory(Item $item): JsonResponse
     {
-        $item->load('history');
+        $history = $item->history()->with('rejectionComment')->orderBy('created_at', 'desc')->get();
+
+        $mappedData = $history->map(function ($historyRecord) {
+            return [
+                'id' => $historyRecord->id,
+                'item_id' => $historyRecord->item_id,
+                'date' => $historyRecord->date,
+                'code' => $historyRecord->code,
+                'item_name' => $historyRecord->item_name,
+                'owner' => $historyRecord->owner,
+                'status' => $historyRecord->status,
+                'officer' => $historyRecord->officer,
+                'rejection_reason' => $historyRecord->rejectionComment?->rejection_reason,
+                'admin_name' => $historyRecord->rejectionComment?->rejected_by,
+                'created_at' => $historyRecord->created_at,
+                'updated_at' => $historyRecord->updated_at
+            ];
+        });
 
         return response()->json([
             'success' => true,
-            'data' => $item->history
+            'data' => $mappedData
         ]);
     }
     

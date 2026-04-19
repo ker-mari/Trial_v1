@@ -30,6 +30,7 @@ class History extends Model
     protected $visible = [
         'id',
         'item_id',
+        'pending_edit_id',
         'date',
         'code',
         'item_name',
@@ -37,9 +38,19 @@ class History extends Model
         'status',
         'officer',
         'created_at',
-        'updated_at'
+        'updated_at',
+        'admin_comment'
     ];
+    protected $appends = ['admin_comment'];
 
+    public function getAdminCommentAttribute()
+    {
+        if ($this->status !== 'Edit Rejected') return null;
+        return $this->rejectionComment?->comment
+            ?? $this->rejectionComment?->comments
+            ?? $this->rejectionComment?->reason
+            ?? null;
+    }
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
@@ -48,8 +59,8 @@ class History extends Model
     public function rejectionComment()
     {
         return $this->hasOne(RejectionComment::class, 'item_id', 'item_id')
-                    ->where('pending_edit_id', $this->pending_edit_id ?? 0)
-                    ->latest();
+            ->where('pending_edit_id', $this->pending_edit_id ?? 0)
+            ->latest();
     }
 
     public static function createRecord($item, $action, $officer = 'System', $owner = null)
