@@ -31,6 +31,14 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->api([
             \Illuminate\Http\Middleware\HandleCors::class,
         ]);
+        
+        // Add method override for handling _method spoofing
+        $middleware->web(append: [
+            \Illuminate\Foundation\Http\Middleware\MethodNotAllowed::class,
+        ]);
+        
+        // Enable method spoofing globally
+        $middleware->append(\Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
