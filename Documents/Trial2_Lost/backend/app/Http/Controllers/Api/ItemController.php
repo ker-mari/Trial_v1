@@ -303,7 +303,7 @@ class ItemController extends Controller
         $perPage = $request->input('per_page', 50); // Default 50 items per page
         $perPage = min(max((int)$perPage, 1), 100); // Limit between 1-100
 
-        $historyQuery = History::with('item')
+        $historyQuery = History::with(['item', 'rejectionComment'])
             ->whereNotIn('status', ['Approved', 'Handed Over'])
             ->orderBy('created_at', 'desc');
 
@@ -334,6 +334,8 @@ class ItemController extends Controller
                 'owner' => $historyRecord->owner,
                 'status' => $historyRecord->status,
                 'officer' => $historyRecord->officer,
+                'rejection_reason' => $historyRecord->rejectionComment?->rejection_reason,
+                'admin_name' => $historyRecord->rejectionComment?->rejected_by,
                 'created_at' => $historyRecord->created_at,
                 'updated_at' => $historyRecord->updated_at
             ];

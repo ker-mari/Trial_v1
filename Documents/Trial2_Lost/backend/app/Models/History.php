@@ -11,6 +11,7 @@ class History extends Model
 
     protected $fillable = [
         'item_id',
+        'pending_edit_id',
         'date',
         'code',
         'item_name',
@@ -42,6 +43,13 @@ class History extends Model
     public function item(): BelongsTo
     {
         return $this->belongsTo(Item::class);
+    }
+
+    public function rejectionComment()
+    {
+        return $this->hasOne(RejectionComment::class, 'item_id', 'item_id')
+                    ->where('pending_edit_id', $this->pending_edit_id ?? 0)
+                    ->latest();
     }
 
     public static function createRecord($item, $action, $officer = 'System', $owner = null)
