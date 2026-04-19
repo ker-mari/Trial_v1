@@ -191,4 +191,20 @@ class ApprovalController extends Controller
             'message' => 'Edit submitted for approval'
         ]);
     }
+
+    public function getRejectionComment($itemId)
+    {
+        $comment = RejectionComment::where('item_id', $itemId)
+            ->latest()
+            ->first();
+
+        if (!$comment) {
+            return response()->json(['rejection_reason' => null]);
+        }
+
+        return response()->json([
+            'rejection_reason' => $comment->rejection_reason,
+            'rejected_by' => $comment->rejected_by,
+        ]);
+    }
 }

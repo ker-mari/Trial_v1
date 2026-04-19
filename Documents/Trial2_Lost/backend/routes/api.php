@@ -21,6 +21,7 @@ Route::middleware([\App\Http\Middleware\CheckPinAuth::class])->group(function ()
     Route::post('items/{item}/claim', [ItemController::class, 'claim'])->middleware('throttle:10,1');
     Route::get('items/{item}/history', [ItemController::class, 'getHistory'])->middleware('throttle:60,1');
     Route::get('items/{item}/rejection-comments', [ItemController::class, 'getRejectionComments'])->middleware('throttle:60,1');
+    Route::get('rejection-comment/{itemId}', [ApprovalController::class, 'getRejectionComment'])->middleware('throttle:60,1');
     Route::get('items-to-be-cleared', [ItemController::class, 'itemsToBeCleared'])->middleware('throttle:60,1');
     Route::get('history', [ItemController::class, 'getAllHistory'])->middleware('throttle:60,1');
     
